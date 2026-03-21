@@ -1,0 +1,133 @@
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+body {
+  margin: 20px;
+  font-size: 14px;
+  font-family: var(--font-primary, inherit);
+  color: var(--brand-dark, #12804A);
+  background-color: var(--brand-soft, #F3FBF6);
+}
+
+.iti__hide {
+  display: none;
+}
+
+pre {
+  margin: 0 !important;
+  display: inline-block;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  background: none;
+}
+
+input,
+button {
+  height: 35px;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 100%;
+  color: inherit;
+}
+
+input[disabled],
+button[disabled] {
+  background-color: var(--brand-soft, #F3FBF6);
+}
+
+input,
+select {
+  border: 1px solid rgba(24, 165, 88, 0.35);
+  width: 250px;
+  background-color: #fff;
+  color: var(--brand-dark, #12804A);
+}
+
+::-webkit-input-placeholder {
+  color: var(--brand-light, #22C16B);
+}
+
+::-moz-placeholder {
+  color: var(--brand-light, #22C16B);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--brand-light, #22C16B);
+}
+
+button {
+  color: #FFF;
+  background-color: var(--brand, #18A558);
+  border: 1px solid var(--brand-dark, #12804A);
+}
+
+button:hover {
+  background-color: var(--brand-soft, #F3FBF6);
+  border-color: var(--brand-dark, #12804A);
+  color: var(--brand-dark, #12804A);
+  cursor: pointer;
+}
+
+#result {
+  margin-bottom: 100px;
+}
+
+#verifyBtn:hover {
+  background-color: #ffffff !important;
+  border-color: var(--brand-dark, #12804A) !important;
+  color: var(--brand-dark, #12804A) !important;
+  cursor: pointer;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #ffffff !important;
+  color: var(--brand-dark, #12804A) !important;
+  border-color: var(--brand, #18A558) !important;
+  cursor: pointer;
+}
+
+@media (max-width: 576px) {
+  .modal-dialog {
+    max-width: 90%;
+    margin: 1.75rem auto;
+  }
+}
+
+@media (min-width: 577px) {
+  .modal-dialog {
+    max-width: 400px;
+  }
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="ltr"] body {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] select,
+html[dir="rtl"] textarea {
+  text-align: right;
+}
+
+html[dir="ltr"] input,
+html[dir="ltr"] select,
+html[dir="ltr"] textarea {
+  text-align: left;
+}

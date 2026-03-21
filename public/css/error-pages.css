@@ -1,0 +1,81 @@
+/* public/css/error-pages.css */
+
+@font-face {
+  font-family: 'AlmaraiLocal';
+  src: url('font/Almarai-Light.woff2') format('woff2'),
+       url('font/Almarai-Light.woff') format('woff'),
+       url('font/Almarai-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AlmaraiLocal';
+  src: url('font/Almarai-Regular.woff2') format('woff2'),
+       url('font/Almarai-Regular.woff') format('woff'),
+       url('font/Almarai-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AlmaraiLocal';
+  src: url('font/Almarai-Bold.woff2') format('woff2'),
+       url('font/Almarai-Bold.woff') format('woff'),
+       url('font/Almarai-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+body.error-page {
+  font-family: 'AlmaraiLocal';
+  background-color: #F3FAF5;
+  color: #256F46;
+  direction: rtl;
+  text-align: center;
+  padding: 50px;
+  margin: 0;
+}
+
+.error-title {
+  font-size: 2.5rem;
+  color: #2E8B57;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
+
+.error-back-link {
+  display: inline-block;
+  padding: 10px 25px;
+  background-color: #2E8B57;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.error-back-link:hover {
+  background-color: #256F46;
+}
+
+@media (max-width: 600px) {
+  body.error-page {
+    padding: 20px;
+  }
+
+  .error-title {
+    font-size: 2rem;
+  }
+
+  .error-message,
+  .error-back-link {
+    font-size: 1rem;
+  }
+}

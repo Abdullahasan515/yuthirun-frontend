@@ -1,0 +1,139 @@
+@font-face{
+    font-family: 'PingARLocal';
+    src: url('/font/PingAR+LT-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face{
+    font-family: 'PingARLocal';
+    src: url('/font/PingAR+LT-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+.hedsid{
+    display: flex;
+    margin: 140px 0 10px 0;
+    gap: 5px;
+    font-family: 'PingARLocal', sans-serif;
+}
+.hedsid h6:nth-child(2){
+    color: #128347;
+}
+
+.aboutt h1{
+    color: #128347;
+    font-weight: 600;
+    font-family: 'PingARLocal', sans-serif;
+}
+/* ///////////////////////card_about /////////// */
+.card_about{
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 50px;
+    margin-top: 40px;
+    border: 1px solid rgba(24,165,88,.14);
+    box-shadow: 0 16px 36px rgba(24,165,88,.10);
+    background: radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.08), transparent 60%), #fff;
+}
+
+.text_card{
+    width: 50%;
+    line-height: 220%;
+    font-family: 'PingARLocal', sans-serif;
+}
+.text_card p{
+    font-size: 18px;
+    color: #557463;
+    text-align: justify;
+}
+.text_card h5{
+    background-color: #18A558;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: all .4s ease;
+}
+.text_card h5:hover{
+    background-color: #128347;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+.text_card h5 a{
+    color: #fff;
+}
+.img_card_about img{
+    width: 500px;
+}
+
+.card2 img{
+    width: 300px;
+}
+.card2 .text_card{
+    margin-top: 20px;
+    width: 100%;
+}
+.card2 .text_card h1{
+    margin-bottom: 20px;
+}
+.card3 .text_card h1{
+    margin-bottom: 20px;
+}
+.card2 p{
+    color: #557463;
+}
+.card3 p{
+    color: #557463;
+}
+@media (max-width:1250px){
+    .text_card{
+        width: 90%;
+        line-height: 220%;
+    }
+    .card_about{
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .img_card_about img{
+        width: 400px;
+    }
+    
+    .card2 img{
+        width: 300px;
+    }
+}
+@media (max-width:583px){
+    .card_about{
+        padding: 20px;
+    }
+    .img_card_about img{
+        width: 300px;
+    }
+    .card3 img{
+        width: 400px;
+    }
+}
+@media (max-width:450px){
+    .img_card_about img{
+        width: 300px;
+    }
+    .card3 img{
+        width: 330px;
+    }
+    .card2 img{
+        padding-left: 50px;
+    }
+}

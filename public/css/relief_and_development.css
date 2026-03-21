@@ -1,0 +1,14 @@
+.newss{
+    flex-direction: column;
+}
+.newss p{
+    color: #6A2331;
+}
+.newss h3{
+    color: #7B2C3B;
+    font-weight: 600;
+    margin-top: 15px;
+}
+.allcardnews{
+    margin-top: 10px;
+}

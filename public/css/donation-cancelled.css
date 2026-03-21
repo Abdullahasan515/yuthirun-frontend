@@ -1,0 +1,128 @@
+/* server/public/css/donation-cancelled.css */
+
+@font-face {
+    font-family: 'AlmaraiLocal';
+    src: url('font/Almarai-Light.woff2') format('woff2'),
+         url('font/Almarai-Light.woff') format('woff'),
+         url('font/Almarai-Light.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'AlmaraiLocal';
+    src: url('font/Almarai-Regular.woff2') format('woff2'),
+         url('font/Almarai-Regular.woff') format('woff'),
+         url('font/Almarai-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'AlmaraiLocal';
+    src: url('font/Almarai-Bold.woff2') format('woff2'),
+         url('font/Almarai-Bold.woff') format('woff'),
+         url('font/Almarai-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --color-bg: #F3FAF5;
+    --color-text: #256F46;
+    --color-accent: #2E8B57;
+    --color-accent-hover: #256F46;
+    --color-container-bg: #FFFFFF;
+    --shadow-color: rgba(46, 139, 87, 0.3);
+}
+
+body {
+    background-color: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'AlmaraiLocal', sans-serif;
+    color: var(--color-text);
+    direction: rtl;
+}
+
+.cancel-container {
+    background: var(--color-container-bg);
+    padding: 40px 35px 35px;
+    border-radius: 14px;
+    box-shadow: 0 12px 20px var(--shadow-color);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.cancel-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 28px var(--shadow-color);
+}
+
+.cancel-container a.btn {
+    margin-top: 20px;
+    background-color: #2E8B57;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.logo {
+    width: 140px;
+    margin: 0 auto 28px;
+    display: block;
+    filter: drop-shadow(0 2px 2px rgba(46, 139, 87, 0.25));
+    cursor: default;
+    transition: filter 0.3s ease;
+}
+
+.logo:hover {
+    filter: drop-shadow(0 3px 6px rgba(46, 139, 87, 0.45));
+}
+
+.quranic-verse {
+    font-family: 'AlmaraiLocal', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #1F5A39;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    direction: rtl;
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 36px;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.btn-home {
+    background-color: #2E8B57;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 6px 12px rgba(46, 139, 87, 0.45);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+}
+
+.btn-home:hover {
+    background-color: #256F46;
+    box-shadow: 0 8px 20px rgba(46, 139, 87, 0.6);
+    color: #fff;
+}

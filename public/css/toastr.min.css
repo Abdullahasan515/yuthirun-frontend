@@ -1,0 +1,68 @@
+:root {
+    --toast-bg: #ffffff;
+    --toast-text: #4b3b2b;
+    --toast-border: #b3572f;
+    --toast-hover-border: #8a441f;
+    --toast-padding: 1.2rem 1.5rem;
+    --toast-max-width: 90vw;
+    --toast-width-ratio: 90%;
+    --toast-radius: 0.5rem;
+    --toast-icon-size: 60px;
+    --toast-font-size: 1.1rem;
+}
+
+#toast-container {
+    position: fixed;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--toast-width-ratio) !important;
+    max-width: var(--toast-max-width) !important;
+    pointer-events: none;
+    z-index: 999999;
+}
+
+#toast-container>div {
+    position: relative;
+    pointer-events: auto;
+    overflow: hidden;
+    margin: 0 auto 6px auto !important;
+    padding: var(--toast-padding) !important;
+    width: 100% !important;
+    border: 1px solid var(--toast-border) !important;
+    border-radius: var(--toast-radius) !important;
+    background-color: var(--toast-bg) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-size: var(--toast-font-size) !important;
+    box-shadow: none !important;
+    transition: border-color .2s;
+}
+
+#toast-container>div:hover {
+    border-color: var(--toast-hover-border) !important;
+}
+
+#toast-container>div:before {
+    content: "";
+    display: inline-block;
+    width: var(--toast-icon-size) !important;
+    height: var(--toast-icon-size) !important;
+    margin-right: 1rem !important;
+    background: url("/images/Afaq1.png") center/contain no-repeat !important;
+    flex-shrink: 0;
+}
+
+#toast-container>div .toast-message,
+#toast-container>div .toast-title {
+    color: var(--toast-text) !important;
+}
+
+#toast-container>div.toast-success,
+#toast-container>div.toast-error,
+#toast-container>div.toast-info,
+#toast-container>div.toast-warning {
+    background-image: none !important;
+}
