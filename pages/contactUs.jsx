@@ -239,7 +239,7 @@ export default function ContactUs() {
                   </Swiper>
                 ) : (
                   <div className="mini_hero_placeholder">
-                    <img src="/images/Afaq1.png" alt="يؤثرون" />
+                    <img src="/images/logo.png" alt="يؤثرون" />
                     <p>جارٍ تحميل السلايدر...</p>
                   </div>
                 )}
