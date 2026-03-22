@@ -155,22 +155,23 @@ export default function Donate() {
   const handleCountryChange = val => {
     setForm(f => ({ ...f, country: val, state: '' }));
   };
+
   const handleStateChange = val => {
     setForm(f => ({ ...f, state: val }));
   };
+
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
     setForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
   };
+
   const handleCardSelect = val => {
     setForm(f => ({ ...f, amount: val, customAmountToggle: false, customAmount: '' }));
   };
 
-  // تهيئة وترجمة الدول والمناطق والتأكد من توافق البيانات مع Next.js 15 Turbopack
   const localizedCountries = useMemo(() => {
     let safeData = [];
-    
-    // استخراج المصفوفة بأمان لتجنب خطأ map is not a function
+
     if (Array.isArray(CountryRegionData)) {
       safeData = CountryRegionData;
     } else if (CountryRegionData?.default && Array.isArray(CountryRegionData.default)) {
@@ -294,6 +295,7 @@ export default function Donate() {
             Accept: 'application/json',
           },
         });
+
         if (!res.ok) throw new Error(`فشل في جلب البيانات (الحالة: ${res.status})`);
 
         const data = await res.json();
@@ -333,11 +335,13 @@ export default function Donate() {
       setLoading(false);
       return;
     }
+
     if (!form.country) {
       toast.error(t[lang].mustCountry);
       setLoading(false);
       return;
     }
+
     if (!form.state) {
       toast.error(t[lang].mustRegion);
       setLoading(false);
@@ -345,6 +349,7 @@ export default function Donate() {
     }
 
     let amountToSend = form.amount;
+
     if (form.customAmountToggle) {
       const val = parseFloat(form.customAmount);
       if (isNaN(val) || val <= 0) {
@@ -378,10 +383,14 @@ export default function Donate() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+
       const data = await res.json();
+
       if (!res.ok) throw new Error(data.msg || data.error || `خطأ حالة ${res.status}`);
+
       const redirectUrl = data.checkout_url || data.paymentUrl || data.paypal_url;
       if (!redirectUrl) throw new Error('لم يتم العثور على رابط للدفع');
+
       window.location.href = redirectUrl;
     } catch (err) {
       console.error('Donation error:', err);
@@ -392,11 +401,19 @@ export default function Donate() {
   };
 
   if (!hasMounted) {
-    return <div className="containerr" style={{ padding: 30, fontSize: 18 }}>{t[lang].loading}</div>;
+    return (
+      <div className="containerr" style={{ padding: 30, fontSize: 18 }}>
+        {t[lang].loading}
+      </div>
+    );
   }
 
   if (loading && projects.length === 0 && !errorLoadingProjects) {
-    return <div className="containerr" style={{ padding: 30, fontSize: 18 }}>{t[lang].loadingProjects}</div>;
+    return (
+      <div className="containerr" style={{ padding: 30, fontSize: 18 }}>
+        {t[lang].loadingProjects}
+      </div>
+    );
   }
 
   return (
@@ -418,7 +435,9 @@ export default function Donate() {
           <h1>{newsItem?.title || t[lang].pageTitleFallback}</h1>
 
           {errorLoadingProjects && (
-            <div style={{ color: '#128347', marginBottom: 20 }}>{t[lang].fetchFail}</div>
+            <div style={{ color: '#128347', marginBottom: 20 }}>
+              {t[lang].fetchFail}
+            </div>
           )}
 
           <form className="body_donate" id="donateForm" onSubmit={handleSubmit}>
@@ -435,6 +454,7 @@ export default function Donate() {
                   value={form.donorName}
                   onChange={handleChange}
                 />
+
                 <input
                   type="email"
                   name="email"
@@ -448,11 +468,15 @@ export default function Donate() {
               <div className="input_donate">
                 <div className="selectPhone">
                   <PhoneInput
-                    country={'ye'}
+                    country="ye"
+                    onlyCountries={['ye']}
                     preferredCountries={['ye']}
                     localization={lang === 'ar' ? ar : undefined}
                     value={form.phone}
-                    onChange={(phone) => setForm({ ...form, phone })}
+                    onChange={(phone) => setForm(prev => ({ ...prev, phone }))}
+                    disableCountryGuess={true}
+                    disableInitialCountryGuess={true}
+                    countryCodeEditable={false}
                     inputClass="inputPhoneI"
                     containerClass="phone-container"
                     buttonClass="phone-flag-button"
@@ -474,6 +498,7 @@ export default function Donate() {
                     containerStyle={{ direction: lang === 'ar' ? 'rtl' : 'ltr' }}
                   />
                 </div>
+
                 <select
                   id="project"
                   name="project"
@@ -482,7 +507,9 @@ export default function Donate() {
                   value={form.project}
                   onChange={handleChange}
                 >
-                  <option value="" disabled hidden>{t[lang].chooseProject}</option>
+                  <option value="" disabled hidden>
+                    {t[lang].chooseProject}
+                  </option>
 
                   {newsItem ? (
                     <>
@@ -513,13 +540,17 @@ export default function Donate() {
                   value={form.country}
                   onChange={(e) => handleCountryChange(e.target.value)}
                 >
-                  <option value="" disabled hidden>{t[lang].chooseCountry}</option>
+                  <option value="" disabled hidden>
+                    {t[lang].chooseCountry}
+                  </option>
+
                   {localizedCountries.map(c => (
                     <option key={c.isoCode} value={c.originalName}>
                       {c.localizedName}
                     </option>
                   ))}
                 </select>
+
                 <select
                   name="state"
                   className="form-select"
@@ -527,7 +558,10 @@ export default function Donate() {
                   value={form.state}
                   onChange={(e) => handleStateChange(e.target.value)}
                 >
-                  <option value="" disabled hidden>{t[lang].chooseRegion}</option>
+                  <option value="" disabled hidden>
+                    {t[lang].chooseRegion}
+                  </option>
+
                   {regions.map(r => (
                     <option key={r.name} value={r.name}>
                       {r.name}
@@ -625,7 +659,7 @@ export default function Donate() {
 
                 <div className="cardsDonate">
                   <div
-                    className={`cardDonateS active`}
+                    className="cardDonateS active"
                     style={{ cursor: 'default' }}
                   >
                     <i className="bx bx-check" />
@@ -660,7 +694,7 @@ export default function Donate() {
 
           <div id="card-element-sub" className="mt-4" />
         </section>
-      </div >
+      </div>
 
       <style jsx global>{`
         :root{
@@ -669,7 +703,11 @@ export default function Donate() {
           --brand-light:#35C46F;
           --cream:#EEF9F2;
         }
-        .blowline{ height:2px; background:linear-gradient(90deg,var(--brand),var(--brand-light)); border-radius:2px; }
+        .blowline{
+          height:2px;
+          background:linear-gradient(90deg,var(--brand),var(--brand-light));
+          border-radius:2px;
+        }
         .body_donate .form-select,
         .body_donate input[type="text"],
         .body_donate input[type="email"],
@@ -718,14 +756,26 @@ export default function Donate() {
           padding:12px 18px;
           transition: background .2s ease, transform .1s ease;
         }
-        .btnDonare:hover{ background: var(--brand-dark); transform: translateY(-1px); }
-        .btnDonare:disabled{ background: var(--brand-light); opacity:.7; }
+        .btnDonare:hover{
+          background: var(--brand-dark);
+          transform: translateY(-1px);
+        }
+        .btnDonare:disabled{
+          background: var(--brand-light);
+          opacity:.7;
+        }
         .inputCheck .form-check-input:checked{
           background-color: var(--brand);
           border-color: var(--brand);
         }
-        .inputCheck label{ color:#128347; }
-        .right_donate h2, .leftdonateForm h5, .aboutt h1{ color:#128347; }
+        .inputCheck label{
+          color:#128347;
+        }
+        .right_donate h2,
+        .leftdonateForm h5,
+        .aboutt h1{
+          color:#128347;
+        }
         .phone-container .form-control{
           border-radius: 10px !important;
           border:1px solid rgba(24,165,88,.25) !important;
@@ -734,6 +784,8 @@ export default function Donate() {
         .phone-flag-button{
           border:1px solid rgba(24,165,88,.25) !important;
           background:#fff !important;
+          pointer-events: none !important;
+          cursor: default !important;
         }
         .phone-dropdown{
           max-height:240px;
@@ -745,11 +797,26 @@ export default function Donate() {
         .cardsDonate .cardDonateS i{
           color: var(--brand);
         }
-        .imgGC img.imgS{ height:32px }
-        html[dir="rtl"] .react-tel-input .selected-flag{ right:auto; left:0; }
-        html[dir="rtl"] .react-tel-input .form-control{ padding-right: 48px !important; padding-left: 12px !important; text-align: right; }
-        html[dir="ltr"] .react-tel-input .form-control{ text-align: left; }
-        .aboutt{ background: linear-gradient(180deg, rgba(238,249,242,.65), rgba(255,255,255,.0)); border-radius:16px; padding:8px; }
+        .imgGC img.imgS{
+          height:32px;
+        }
+        html[dir="rtl"] .react-tel-input .selected-flag{
+          right:auto;
+          left:0;
+        }
+        html[dir="rtl"] .react-tel-input .form-control{
+          padding-right: 48px !important;
+          padding-left: 12px !important;
+          text-align: right;
+        }
+        html[dir="ltr"] .react-tel-input .form-control{
+          text-align: left;
+        }
+        .aboutt{
+          background: linear-gradient(180deg, rgba(238,249,242,.65), rgba(255,255,255,.0));
+          border-radius:16px;
+          padding:8px;
+        }
       `}</style>
     </>
   );
