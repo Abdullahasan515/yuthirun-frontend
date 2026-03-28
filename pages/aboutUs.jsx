@@ -1,4 +1,4 @@
-//client/pages/aboutUs.jsx
+// client/pages/aboutUs.jsx
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -7,16 +7,16 @@ export default function AboutUs({ cards = [] }) {
   const [lang, setLang] = useState('ar');
 
   useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('site_lang') : null;
-    const initial = saved || (typeof navigator !== 'undefined' ? ((navigator.language || 'ar').startsWith('ar') ? 'ar' : 'en') : 'ar');
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('siteLang') : null;
+    const initial = saved || 'ar';
     setLang(initial);
   }, []);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.documentElement.lang = lang;
-      document.documentElement.dir = ['ar','he','fa','ur'].includes(lang) ? 'rtl' : 'ltr';
-      try { localStorage.setItem('site_lang', lang); } catch {}
+      document.documentElement.lang = 'ar';
+      document.documentElement.dir = 'rtl';
+      try { localStorage.setItem('siteLang', 'ar'); } catch {}
     }
   }, [lang]);
 
@@ -27,10 +27,7 @@ export default function AboutUs({ cards = [] }) {
         <meta name="description" content="مشروعنا يؤثرون" />
       </Head>
 
-      <div
-        className="containerr about-page"
-        dir={['ar','he','fa','ur'].includes(lang) ? 'rtl' : 'ltr'}
-      >
+      <div className="containerr about-page">
         <div className="lang-switch">
           <select value={lang} onChange={(e)=>setLang(e.target.value)}>
             <option value="ar">العربية</option>
@@ -130,38 +127,19 @@ export default function AboutUs({ cards = [] }) {
           font-family:'PingARLocal', sans-serif !important;
         }
 
-        .about-page[dir="rtl"]{
+        .about-page{
           direction: rtl;
           text-align: right;
         }
 
-        .about-page[dir="ltr"]{
-          direction: ltr;
-          text-align: left;
-        }
-
-        .about-page[dir="rtl"] .card_about{
-          flex-direction: row-reverse;
-        }
-
-        .about-page[dir="ltr"] .card_about{
-          flex-direction: row;
-        }
-
-        .about-page[dir="rtl"] .text_card{
+        .hedsid{
+          direction: rtl;
           text-align: right;
         }
 
-        .about-page[dir="ltr"] .text_card{
-          text-align: left;
-        }
-
-        .about-page[dir="rtl"] .hedsid{
+        .aboutt{
+          direction: rtl;
           text-align: right;
-        }
-
-        .about-page[dir="ltr"] .hedsid{
-          text-align: left;
         }
 
         .aboutt h1{
@@ -180,10 +158,13 @@ export default function AboutUs({ cards = [] }) {
           align-items:center;
           justify-content:space-between;
           gap:20px;
+          direction: rtl;
+          text-align: right;
         }
 
         .card_about .text_card{
           flex:1;
+          text-align:right;
         }
 
         .card_about .text_card h1{
@@ -229,8 +210,9 @@ export default function AboutUs({ cards = [] }) {
 
         .lang-switch{
           display:flex;
-          justify-content:flex-end;
+          justify-content:flex-start;
           padding:12px 0;
+          direction: rtl;
         }
 
         .lang-switch select{
