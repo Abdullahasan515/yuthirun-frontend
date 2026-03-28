@@ -1,5 +1,4 @@
 //client/pages/aboutUs.jsx
-//client/pages/aboutUs.jsx
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -28,7 +27,10 @@ export default function AboutUs({ cards = [] }) {
         <meta name="description" content="مشروعنا يؤثرون" />
       </Head>
 
-      <div className="containerr about-page">
+      <div
+        className="containerr about-page"
+        dir={['ar','he','fa','ur'].includes(lang) ? 'rtl' : 'ltr'}
+      >
         <div className="lang-switch">
           <select value={lang} onChange={(e)=>setLang(e.target.value)}>
             <option value="ar">العربية</option>
@@ -79,7 +81,6 @@ export default function AboutUs({ cards = [] }) {
                     )}
                   </div>
 
-                  {/* ✅ تم تعديل هنا */}
                   <div className="img_card_about">
                     <img src={imageUrl} alt={card.title} />
                   </div>
@@ -129,6 +130,40 @@ export default function AboutUs({ cards = [] }) {
           font-family:'PingARLocal', sans-serif !important;
         }
 
+        .about-page[dir="rtl"]{
+          direction: rtl;
+          text-align: right;
+        }
+
+        .about-page[dir="ltr"]{
+          direction: ltr;
+          text-align: left;
+        }
+
+        .about-page[dir="rtl"] .card_about{
+          flex-direction: row-reverse;
+        }
+
+        .about-page[dir="ltr"] .card_about{
+          flex-direction: row;
+        }
+
+        .about-page[dir="rtl"] .text_card{
+          text-align: right;
+        }
+
+        .about-page[dir="ltr"] .text_card{
+          text-align: left;
+        }
+
+        .about-page[dir="rtl"] .hedsid{
+          text-align: right;
+        }
+
+        .about-page[dir="ltr"] .hedsid{
+          text-align: left;
+        }
+
         .aboutt h1{
           color:var(--primary-dark);
         }
@@ -159,7 +194,6 @@ export default function AboutUs({ cards = [] }) {
           color:#476052;
         }
 
-        /* ✅ أهم تعديل */
         .img_card_about{
           width:250px;
           height:180px;
@@ -171,7 +205,7 @@ export default function AboutUs({ cards = [] }) {
         .img_card_about img{
           width:100%;
           height:100%;
-          object-fit:cover; /* يحافظ على الشكل بدون تشويه */
+          object-fit:cover;
           display:block;
         }
 
