@@ -25,22 +25,6 @@ const mediaUrl = (u) => {
   return `${API_BASE}/${u}`;
 };
 
-const getNewsViewerId = () => {
-  if (typeof window === "undefined") return "server";
-  try {
-    let id = localStorage.getItem("news_fp");
-    if (!id) {
-      id =
-        window.crypto?.randomUUID?.() ||
-        `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`;
-      localStorage.setItem("news_fp", id);
-    }
-    return id;
-  } catch {
-    return "anon";
-  }
-};
-
 const NewsDetailPage = () => {
   const router = useRouter();
   const { id } = router.query;
@@ -58,11 +42,7 @@ const NewsDetailPage = () => {
       try {
         setLoading(true);
 
-        const resDetail = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/news/${id}`, {
-          headers: {
-            "x-news-fp": getNewsViewerId()
-          }
-        });
+        const resDetail = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/news/${id}`);
         if (!resDetail.ok) throw new Error("فشل في جلب تفاصيل الخبر");
         const detailData = await resDetail.json();
 
