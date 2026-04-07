@@ -1,4 +1,4 @@
-// pages/index.jsx
+// path: pages/index.jsx
 import { useEffect, useState, useCallback } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -193,7 +193,7 @@ export default function Home() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 80, 0, 0.55)', // خلفية غامقة خضراء
+            background: 'rgba(0, 80, 0, 0.55)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -205,7 +205,7 @@ export default function Home() {
             style={{
               position: 'relative',
               width: 'min(520px,92vw)',
-              background: '#f0fff4', // أخضر فاتح جدًا
+              background: '#f0fff4',
               borderRadius: '16px',
               padding: '22px',
               boxShadow: '0 20px 60px rgba(0, 100, 0, 0.3)',
@@ -225,7 +225,7 @@ export default function Home() {
                 height: 36,
                 borderRadius: 999,
                 border: 'none',
-                background: '#16a34a', // أخضر أساسي
+                background: '#16a34a',
                 color: '#fff',
                 cursor: 'pointer',
                 fontSize: 20
@@ -282,7 +282,7 @@ export default function Home() {
                   border: '1px solid #86efac',
                   outline: 'none',
                   width: '80%',
-                  margin: '0 auto',       // هذا اللي يوسّطه فعليًا
+                  margin: '0 auto',
                   display: 'block',
                   textAlign: 'center'
                 }}
@@ -294,7 +294,7 @@ export default function Home() {
                   padding: '10px 14px',
                   borderRadius: 10,
                   border: 'none',
-                  background: '#16a34a', // أخضر رئيسي
+                  background: '#16a34a',
                   color: '#fff',
                   fontWeight: 700,
                   cursor: 'pointer'
@@ -634,6 +634,7 @@ export default function Home() {
       </div>
 
       <style jsx global>{`
+/* path: pages/index.jsx - Gaza stats dark mode enhancement */
 :root{
   --primary:#18a558;
   --primary-light:#35c46f;
@@ -641,7 +642,42 @@ export default function Home() {
   --cream:#f3fff8;
   --text:#123222;
   --muted:#4e6b5a;
+
+  --gz-surface:#ffffff;
+  --gz-surface-soft:rgba(255,255,255,.88);
+  --gz-surface-alt:#f7fff9;
+  --gz-border:rgba(20,90,50,.10);
+  --gz-shadow:0 10px 26px rgba(20,80,40,.06);
+  --gz-shadow-soft:0 8px 20px rgba(20,80,40,.05);
+  --gz-tab-bg:rgba(24,165,88,.08);
+  --gz-tab-active-bg:#ffffff;
+  --gz-skeleton-1:#eef8f1;
+  --gz-skeleton-2:#f8fffa;
+  --gz-number:#128247;
+  --gz-title:#123222;
+  --gz-muted:#4e6b5a;
 }
+
+html[data-theme='dark']{
+  --text:#e7f5ec;
+  --muted:#9ab7a6;
+  --cream:#0d1711;
+
+  --gz-surface:#121a15;
+  --gz-surface-soft:rgba(18,26,21,.92);
+  --gz-surface-alt:#0f1512;
+  --gz-border:rgba(120,214,153,.16);
+  --gz-shadow:0 14px 34px rgba(0,0,0,.32);
+  --gz-shadow-soft:0 10px 24px rgba(0,0,0,.28);
+  --gz-tab-bg:rgba(24,165,88,.16);
+  --gz-tab-active-bg:#18231c;
+  --gz-skeleton-1:#17211b;
+  --gz-skeleton-2:#223128;
+  --gz-number:#86efac;
+  --gz-title:#e7f5ec;
+  --gz-muted:#9ab7a6;
+}
+
         .vision-hero{
           position:relative;
           min-height:100vh;
@@ -853,13 +889,20 @@ export default function Home() {
       }
 
       .gz-wrap{
-        border:1px solid rgba(20,90,50,.10);
+        border:1px solid var(--gz-border);
         border-radius:18px;
         padding:12px;
         background:
           radial-gradient(1200px 280px at 100% 0%, rgba(24,165,88,.08), transparent 60%),
-          linear-gradient(180deg,#f7fff9,#ffffff);
-        box-shadow:0 10px 26px rgba(20,80,40,.06);
+          linear-gradient(180deg,var(--gz-surface-alt),var(--gz-surface));
+        box-shadow:var(--gz-shadow);
+        transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      }
+
+      html[data-theme='dark'] .gz-wrap{
+        background:
+          radial-gradient(1200px 280px at 100% 0%, rgba(53,196,111,.14), transparent 60%),
+          linear-gradient(180deg,#101712,#0b100d);
       }
 
       .gz-head{
@@ -875,7 +918,7 @@ export default function Home() {
         align-items:center;
         gap:8px;
         font-weight:800;
-        color:var(--text);
+        color:var(--gz-title);
       }
 
       .gz-head .ttl i{
@@ -884,12 +927,12 @@ export default function Home() {
       }
 
       .gz-head .dt{
-        color:var(--muted);
+        color:var(--gz-muted);
         font-size:12px;
       }
 
       .gz-err{
-        color:var(--primary-dark);
+        color:var(--gz-number);
         font-weight:700;
         padding:6px 0;
       }
@@ -917,12 +960,13 @@ export default function Home() {
         align-items:center;
         justify-content:space-between;
         gap:8px;
-        background:rgba(255,255,255,.88);
-        border:1px solid rgba(20,90,50,.10);
+        background:var(--gz-surface-soft);
+        border:1px solid var(--gz-border);
         border-radius:14px;
         padding:10px 12px;
-        box-shadow:0 8px 20px rgba(20,80,40,.05);
+        box-shadow:var(--gz-shadow-soft);
         min-height:56px;
+        transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
       }
 
       .chip i{
@@ -931,7 +975,7 @@ export default function Home() {
       }
 
       .chip span{
-        color:var(--text);
+        color:var(--gz-title);
         font-weight:700;
         font-size:13px;
       }
@@ -939,7 +983,7 @@ export default function Home() {
       .chip strong{
         font-size:18px;
         font-weight:900;
-        color:var(--primary-dark);
+        color:var(--gz-number);
       }
 
       .grid.loading .chip strong{ opacity:.5 }
@@ -950,11 +994,18 @@ export default function Home() {
       .gz-card{
         background:
           radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.10), transparent 60%),
-          linear-gradient(180deg,#ffffff,#f7fff9);
-        border:1px solid rgba(20,90,50,.10);
+          linear-gradient(180deg,var(--gz-surface),var(--gz-surface-alt));
+        border:1px solid var(--gz-border);
         border-radius:18px;
         padding:clamp(14px, 2vw, 20px);
-        box-shadow:0 10px 30px rgba(20,80,40,.06);
+        box-shadow:var(--gz-shadow);
+        transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      }
+
+      html[data-theme='dark'] .gz-card{
+        background:
+          radial-gradient(1200px 300px at 100% 0%, rgba(53,196,111,.12), transparent 60%),
+          linear-gradient(180deg,#121a15,#0d1410);
       }
 
       .gz-header{
@@ -983,20 +1034,21 @@ export default function Home() {
       }
 
       .gz-date{
-        color:var(--muted);
+        color:var(--gz-muted);
         font-size:12px;
       }
 
       .gz-tabs{
         display:flex;
         gap:8px;
-        background:rgba(24,165,88,.08);
+        background:var(--gz-tab-bg);
         padding:6px;
         border-radius:12px;
         width:fit-content;
         margin-inline-start:auto;
         margin-top:6px;
         margin-bottom:10px;
+        transition: background .25s ease;
       }
 
       .gz-tab{
@@ -1009,8 +1061,8 @@ export default function Home() {
         border:none;
         cursor:pointer;
         font-weight:700;
-        color:var(--text);
-        transition: transform .15s ease, background .2s ease;
+        color:var(--gz-title);
+        transition: transform .15s ease, background .2s ease, color .2s ease, box-shadow .25s ease;
       }
 
       .gz-tab i{
@@ -1019,9 +1071,13 @@ export default function Home() {
       }
 
       .gz-tab.active{
-        background:#fff;
+        background:var(--gz-tab-active-bg);
         box-shadow:0 6px 18px rgba(20,80,40,.08);
         transform:translateY(-1px);
+      }
+
+      html[data-theme='dark'] .gz-tab.active{
+        box-shadow:0 8px 20px rgba(0,0,0,.22);
       }
 
       .gz-tab:not(.active):hover{
@@ -1029,12 +1085,16 @@ export default function Home() {
         background:rgba(24,165,88,.06);
       }
 
+      html[data-theme='dark'] .gz-tab:not(.active):hover{
+        background:rgba(24,165,88,.10);
+      }
+
       .gz-body{ margin-top:10px }
-      .gz-error{ color:var(--primary-dark); font-weight:700 }
+      .gz-error{ color:var(--gz-number); font-weight:700 }
 
       .gz-skeleton .sk-bar{
         height:16px; width:160px; border-radius:6px;
-        background:linear-gradient(90deg,#eef8f1,#f8fffa,#eef8f1);
+        background:linear-gradient(90deg,var(--gz-skeleton-1),var(--gz-skeleton-2),var(--gz-skeleton-1));
         background-size:200% 100%;
         animation: sh 1.2s infinite linear;
       }
@@ -1051,11 +1111,12 @@ export default function Home() {
         display:flex;
         align-items:center;
         justify-content:space-between;
-        background:#fff;
-        border:1px solid rgba(20,90,50,.10);
+        background:var(--gz-surface);
+        border:1px solid var(--gz-border);
         border-radius:14px;
         padding:14px 16px;
-        box-shadow:0 10px 22px rgba(20,80,40,.05);
+        box-shadow:var(--gz-shadow-soft);
+        transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
       }
 
       .gz-icon{
@@ -1073,11 +1134,11 @@ export default function Home() {
         font-size: clamp(22px, 5.5vw, 34px);
         font-weight:900;
         letter-spacing:.3px;
-        color:var(--primary-dark);
+        color:var(--gz-number);
       }
 
       .gz-label{
-        color:var(--muted);
+        color:var(--gz-muted);
         font-weight:700;
       }
 
@@ -1092,10 +1153,11 @@ export default function Home() {
         align-items:center;
         justify-content:space-between;
         gap:10px;
-        background:#fff;
-        border:1px solid rgba(20,90,50,.10);
+        background:var(--gz-surface);
+        border:1px solid var(--gz-border);
         border-radius:12px;
         padding:10px 12px;
+        transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
       }
 
       .mini-item i{
@@ -1104,19 +1166,19 @@ export default function Home() {
       }
 
       .mini-item span{
-        color:var(--text);
+        color:var(--gz-title);
         font-weight:600;
         font-size:13px;
       }
 
       .mini-item strong{
         font-size:clamp(16px,4.5vw,22px);
-        color:var(--primary-dark);
+        color:var(--gz-number);
       }
 
       .gz-note{
         margin-top:8px;
-        color:var(--muted);
+        color:var(--gz-muted);
         font-size:12px;
       }
 
