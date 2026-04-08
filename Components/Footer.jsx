@@ -1,4 +1,4 @@
-// Components/Footer.jsx
+// path: Components/Footer.jsx
 import { useEffect, useState, useMemo } from 'react';
 
 export default function Footer({ footer = {} }) {
@@ -147,6 +147,7 @@ export default function Footer({ footer = {} }) {
       </a>
 
       <style jsx global>{`
+        /* path: Components/Footer.jsx */
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .spinner{
@@ -339,10 +340,16 @@ export default function Footer({ footer = {} }) {
           color: rgba(255,255,255,.92);
         }
 
+        /* تعديل مهم: جعل خلفية صندوق الاشتراك تشبه خلفية التذييل الأم في الوضع الليلي */
         [data-theme='dark'] .footer .leftfooter{
-          background: linear-gradient(180deg, rgba(17,24,39,.88), rgba(15,23,42,.82));
+          background:
+            radial-gradient(circle at top right, rgba(24,165,88,.14), transparent 32%),
+            radial-gradient(circle at bottom left, rgba(126,226,168,.08), transparent 26%),
+            linear-gradient(180deg, rgba(15,23,42,.72), rgba(17,24,39,.68));
           border: 1px solid rgba(255,255,255,.08);
-          box-shadow: 0 14px 34px rgba(0,0,0,.28);
+          box-shadow: 0 14px 34px rgba(0,0,0,.22);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
         }
 
         [data-theme='dark'] .subscribe-card .subscribe-note{
@@ -350,7 +357,7 @@ export default function Footer({ footer = {} }) {
         }
 
         [data-theme='dark'] .subscribe-form input{
-          background: rgba(255,255,255,.06);
+          background: rgba(15,23,42,.48);
           color: #fff;
           border: 1px solid rgba(255,255,255,.10);
         }
@@ -394,10 +401,16 @@ export default function Footer({ footer = {} }) {
             color: rgba(255,255,255,.92);
           }
 
+          /* نفس التعديل هنا لو النظام نفسه دارك وما تم اختيار light يدويًا */
           :root:not([data-theme='light']) .footer .leftfooter{
-            background: linear-gradient(180deg, rgba(17,24,39,.88), rgba(15,23,42,.82));
+            background:
+              radial-gradient(circle at top right, rgba(24,165,88,.14), transparent 32%),
+              radial-gradient(circle at bottom left, rgba(126,226,168,.08), transparent 26%),
+              linear-gradient(180deg, rgba(15,23,42,.72), rgba(17,24,39,.68));
             border: 1px solid rgba(255,255,255,.08);
-            box-shadow: 0 14px 34px rgba(0,0,0,.28);
+            box-shadow: 0 14px 34px rgba(0,0,0,.22);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
           }
 
           :root:not([data-theme='light']) .subscribe-card .subscribe-note{
@@ -405,7 +418,7 @@ export default function Footer({ footer = {} }) {
           }
 
           :root:not([data-theme='light']) .subscribe-form input{
-            background: rgba(255,255,255,.06);
+            background: rgba(15,23,42,.48);
             color: #fff;
             border: 1px solid rgba(255,255,255,.10);
           }
