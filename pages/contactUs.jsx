@@ -1,4 +1,4 @@
-// pages/contactUs.jsx
+// path: pages/contactUs.jsx
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
@@ -250,6 +250,7 @@ export default function ContactUs() {
       </div>
 
       <style jsx global>{`
+        /* path: pages/contactUs.jsx */
         :root{
           --primary:#7B2C3B;
           --primary-light:#8C3F47;
@@ -359,7 +360,11 @@ export default function ContactUs() {
         }
 
         #contact-page .lang-switch{
-          display:flex; justify-content:flex-end; padding: 12px 0;
+          display:flex;
+          justify-content:flex-end;
+          align-items:center;
+          width:100%;
+          padding: 12px 0;
         }
         #contact-page .lang-switch select{
           border:1px solid rgba(123,44,59,.25);
@@ -367,6 +372,8 @@ export default function ContactUs() {
           padding:6px 10px;
           background:#fff;
           color:#3b3b3b;
+          direction: rtl;
+          text-align: right;
         }
 
         #contact-page .mini_hero_wrap{
