@@ -265,7 +265,9 @@ export default function ContactUs() {
           text-align: right;
         }
 
-        #contact-page .aboutt h1{ color: var(--primary-dark) }
+        #contact-page .aboutt h1{
+          color: var(--primary-dark);
+        }
 
         #contact-page .btn_donate{
           background: var(--primary);
@@ -298,6 +300,13 @@ export default function ContactUs() {
           width: 100%;
           text-align: right;
           direction: rtl;
+          background:#f2f4f1;
+          color:#234433;
+        }
+
+        #contact-page .right_contact input::placeholder,
+        #contact-page .right_contact textarea::placeholder{
+          color:#4a8f69;
         }
 
         #contact-page .right_contact input:focus,
@@ -346,8 +355,9 @@ export default function ContactUs() {
         }
 
         #contact-page .body_cotact{
-          background: radial-gradient(1200px 300px at 100% 0%, rgba(123,44,59,.08), transparent 60%),
-                      linear-gradient(180deg,#ffffff, var(--cream));
+          background:
+            radial-gradient(1200px 300px at 100% 0%, rgba(123,44,59,.08), transparent 60%),
+            linear-gradient(180deg,#ffffff, var(--cream));
           border: 1px solid rgba(123,44,59,.14);
           border-radius: 20px;
           padding: 22px;
@@ -356,6 +366,7 @@ export default function ContactUs() {
           grid-template-columns: 1fr 1.08fr;
           gap: 14px;
           align-items: stretch;
+          transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
         }
 
         #contact-page .right_contact{
@@ -433,6 +444,7 @@ export default function ContactUs() {
           height: 100%;
           -webkit-transform: translateZ(0);
           transform: translateZ(0);
+          transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
         }
 
         #contact-page .contactMiniSwiper{
@@ -597,6 +609,110 @@ export default function ContactUs() {
           #contact-page .contactMiniSwiper .swiper-button-prev:after{
             font-size: 12px;
           }
+        }
+
+        html[data-theme='dark'] #contact-page .aboutt h1,
+        body[data-theme='dark'] #contact-page .aboutt h1,
+        html.dark #contact-page .aboutt h1,
+        body.dark #contact-page .aboutt h1{
+          color:#f5f7f6;
+        }
+
+        html[data-theme='dark'] #contact-page .body_cotact,
+        body[data-theme='dark'] #contact-page .body_cotact,
+        html.dark #contact-page .body_cotact,
+        body.dark #contact-page .body_cotact{
+          background:
+            radial-gradient(1200px 300px at 100% 0%, rgba(123,44,59,.18), transparent 60%),
+            linear-gradient(180deg, rgba(18,24,22,.94), rgba(10,14,12,.96));
+          border: 1px solid rgba(255,255,255,.08);
+          box-shadow: 0 22px 54px rgba(0,0,0,.34);
+        }
+
+        html[data-theme='dark'] #contact-page .right_contact input,
+        html[data-theme='dark'] #contact-page .right_contact textarea,
+        body[data-theme='dark'] #contact-page .right_contact input,
+        body[data-theme='dark'] #contact-page .right_contact textarea,
+        html.dark #contact-page .right_contact input,
+        html.dark #contact-page .right_contact textarea,
+        body.dark #contact-page .right_contact input,
+        body.dark #contact-page .right_contact textarea{
+          background: rgba(255,255,255,.06);
+          border: 1px solid rgba(255,255,255,.10);
+          color: #eef7f1;
+        }
+
+        html[data-theme='dark'] #contact-page .right_contact input::placeholder,
+        html[data-theme='dark'] #contact-page .right_contact textarea::placeholder,
+        body[data-theme='dark'] #contact-page .right_contact input::placeholder,
+        body[data-theme='dark'] #contact-page .right_contact textarea::placeholder,
+        html.dark #contact-page .right_contact input::placeholder,
+        html.dark #contact-page .right_contact textarea::placeholder,
+        body.dark #contact-page .right_contact input::placeholder,
+        body.dark #contact-page .right_contact textarea::placeholder{
+          color: rgba(226,240,230,.70);
+        }
+
+        html[data-theme='dark'] #contact-page .checkbox_text .form-check-label,
+        body[data-theme='dark'] #contact-page .checkbox_text .form-check-label,
+        html.dark #contact-page .checkbox_text .form-check-label,
+        body.dark #contact-page .checkbox_text .form-check-label{
+          color:#eef7f1;
+        }
+
+        html[data-theme='dark'] #contact-page .lang-switch select,
+        body[data-theme='dark'] #contact-page .lang-switch select,
+        html.dark #contact-page .lang-switch select,
+        body.dark #contact-page .lang-switch select{
+          background: rgba(255,255,255,.06);
+          color:#eef7f1;
+          border:1px solid rgba(255,255,255,.10);
+        }
+
+        html[data-theme='dark'] #contact-page .mini_hero_slider,
+        body[data-theme='dark'] #contact-page .mini_hero_slider,
+        html.dark #contact-page .mini_hero_slider,
+        body.dark #contact-page .mini_hero_slider{
+          background:
+            radial-gradient(240px 120px at 100% 0%, rgba(123,44,59,.22), transparent 60%),
+            linear-gradient(180deg, rgba(25,31,29,.96), rgba(14,19,17,.98));
+          border: 1px solid rgba(255,255,255,.08);
+          box-shadow: 0 18px 40px rgba(0,0,0,.30);
+        }
+
+        html[data-theme='dark'] #contact-page .mini_hero_placeholder,
+        body[data-theme='dark'] #contact-page .mini_hero_placeholder,
+        html.dark #contact-page .mini_hero_placeholder,
+        body.dark #contact-page .mini_hero_placeholder{
+          color:#eef7f1;
+        }
+
+        html[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-button-next,
+        html[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-button-prev,
+        body[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-button-next,
+        body[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-button-prev,
+        html.dark #contact-page .contactMiniSwiper .swiper-button-next,
+        html.dark #contact-page .contactMiniSwiper .swiper-button-prev,
+        body.dark #contact-page .contactMiniSwiper .swiper-button-next,
+        body.dark #contact-page .contactMiniSwiper .swiper-button-prev{
+          background: rgba(18,24,22,.72);
+          color:#fff;
+          box-shadow: 0 8px 18px rgba(0,0,0,.28);
+        }
+
+        html[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-pagination-bullet,
+        body[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-pagination-bullet,
+        html.dark #contact-page .contactMiniSwiper .swiper-pagination-bullet,
+        body.dark #contact-page .contactMiniSwiper .swiper-pagination-bullet{
+          background: rgba(255,255,255,.35);
+          border: 1px solid rgba(255,255,255,.10);
+        }
+
+        html[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-pagination-bullet-active,
+        body[data-theme='dark'] #contact-page .contactMiniSwiper .swiper-pagination-bullet-active,
+        html.dark #contact-page .contactMiniSwiper .swiper-pagination-bullet-active,
+        body.dark #contact-page .contactMiniSwiper .swiper-pagination-bullet-active{
+          background: #2dc269;
         }
       `}</style>
     </>
