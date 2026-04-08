@@ -16,7 +16,6 @@ export default function AboutUs({ cards = [] }) {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
-      document.body.dir = 'rtl';
       try { localStorage.setItem('siteLang', 'ar'); } catch {}
     }
   }, [lang]);
@@ -30,7 +29,7 @@ export default function AboutUs({ cards = [] }) {
 
       <div className="containerr about-page">
         <div className="lang-switch">
-          <select value={lang} onChange={(e)=>setLang(e.target.value)}>
+          <select value={lang} onChange={(e) => setLang(e.target.value)}>
             <option value="ar">العربية</option>
             <option value="en">English</option>
             <option value="fr">Français</option>
@@ -93,7 +92,6 @@ export default function AboutUs({ cards = [] }) {
 
       <style jsx global>{`
         /* path: client/pages/aboutUs.jsx */
-
         @font-face{
           font-family:'PingARLocal';
           src:url('/font/PingAR+LT-Regular.otf') format('opentype');
@@ -123,12 +121,6 @@ export default function AboutUs({ cards = [] }) {
           --primary-light:#35C46F;
           --primary-dark:#128347;
           --cream:#EEF9F2;
-        }
-
-        html,
-        body{
-          direction: rtl;
-          text-align: right;
         }
 
         .about-page,
@@ -220,22 +212,19 @@ export default function AboutUs({ cards = [] }) {
         .lang-switch{
           display:flex;
           justify-content:flex-end;
+          align-items:center;
+          width:100%;
           padding:12px 0;
           direction: rtl;
           text-align: right;
         }
 
         .lang-switch select{
-          direction: rtl;
-          text-align: right;
           border:1px solid rgba(24,165,88,.25);
           border-radius:10px;
           padding:6px 10px;
           background:#fff;
           color:#234433;
-        }
-
-        .lang-switch option{
           direction: rtl;
           text-align: right;
         }
@@ -246,4 +235,115 @@ export default function AboutUs({ cards = [] }) {
           }
 
           .card_about{
-            border:1px solid rgba(53
+            border:1px solid rgba(53,196,111,.22);
+            background:
+              radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.14), transparent 60%),
+              #111827;
+            box-shadow:0 16px 36px rgba(0,0,0,.35);
+          }
+
+          .card_about .text_card h1{
+            color:#F3FFF8;
+          }
+
+          .card_about .text_card p{
+            color:#C7D7CE;
+          }
+
+          .lang-switch select{
+            background:#111827;
+            color:#F3FFF8;
+            border:1px solid rgba(53,196,111,.22);
+            direction: rtl;
+            text-align: right;
+          }
+        }
+
+        html.dark .aboutt h1,
+        body.dark .aboutt h1{
+          color:#E8FFF1;
+        }
+
+        html.dark .card_about,
+        body.dark .card_about{
+          border:1px solid rgba(53,196,111,.22);
+          background:
+            radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.14), transparent 60%),
+            #111827;
+          box-shadow:0 16px 36px rgba(0,0,0,.35);
+        }
+
+        html.dark .card_about .text_card h1,
+        body.dark .card_about .text_card h1{
+          color:#F3FFF8;
+        }
+
+        html.dark .card_about .text_card p,
+        body.dark .card_about .text_card p{
+          color:#C7D7CE;
+        }
+
+        html.dark .lang-switch select,
+        body.dark .lang-switch select{
+          background:#111827;
+          color:#F3FFF8;
+          border:1px solid rgba(53,196,111,.22);
+          direction: rtl;
+          text-align: right;
+        }
+
+        html:not(.dark) .aboutt h1,
+        body:not(.dark) .aboutt h1{
+          color:var(--primary-dark);
+        }
+
+        html:not(.dark) .card_about,
+        body:not(.dark) .card_about{
+          border:1px solid rgba(24,165,88,.14);
+          background: radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.08), transparent 60%), #fff;
+          box-shadow:0 16px 36px rgba(24,165,88,.10);
+        }
+
+        html:not(.dark) .card_about .text_card h1,
+        body:not(.dark) .card_about .text_card h1{
+          color:#163524;
+        }
+
+        html:not(.dark) .card_about .text_card p,
+        body:not(.dark) .card_about .text_card p{
+          color:#476052;
+        }
+
+        html:not(.dark) .lang-switch select,
+        body:not(.dark) .lang-switch select{
+          background:#fff;
+          color:#234433;
+          border:1px solid rgba(24,165,88,.25);
+          direction: rtl;
+          text-align: right;
+        }
+      `}</style>
+    </>
+  );
+}
+
+export async function getServerSideProps(ctx) {
+  const API = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  let cards = [];
+
+  try {
+    const res = await fetch(`${API}/api/aboutUs`);
+    if (res.ok) {
+      const data = await res.json();
+      cards = Array.isArray(data.cards) ? data.cards : [];
+    } else {
+      console.error('Failed to fetch aboutUs:', res.status);
+    }
+  } catch (err) {
+    console.error('Error fetching aboutUs:', err);
+  }
+
+  return {
+    props: { cards },
+  };
+}
