@@ -38,23 +38,15 @@ export default function ContactUs() {
   const [lang, setLang] = useState('ar');
 
   useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem('site_lang') : null;
-    const initial =
-      saved ||
-      (typeof navigator !== 'undefined'
-        ? (navigator.language || 'ar').startsWith('ar')
-          ? 'ar'
-          : 'en'
-        : 'ar');
-    setLang(initial);
+    setLang('ar');
   }, []);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.documentElement.lang = lang;
-      document.documentElement.dir = ['ar', 'he', 'fa', 'ur'].includes(lang) ? 'rtl' : 'ltr';
+      document.documentElement.lang = 'ar';
+      document.documentElement.dir = 'rtl';
       try {
-        localStorage.setItem('site_lang', lang);
+        localStorage.setItem('site_lang', 'ar');
       } catch {}
     }
   }, [lang]);
@@ -257,7 +249,24 @@ export default function ContactUs() {
           --primary-dark:#6A2331;
           --cream:#F5E9E2;
         }
+
+        #contact-page{
+          direction: rtl;
+          text-align: right;
+        }
+
+        #contact-page .hedsid,
+        #contact-page .aboutt,
+        #contact-page .body_cotact,
+        #contact-page .right_contact,
+        #contact-page form,
+        #contact-page .checkbox_text{
+          direction: rtl;
+          text-align: right;
+        }
+
         #contact-page .aboutt h1{ color: var(--primary-dark) }
+
         #contact-page .btn_donate{
           background: var(--primary);
           border: 1px solid var(--primary);
@@ -267,25 +276,41 @@ export default function ContactUs() {
           font-weight: 800;
           transition: .2s ease;
         }
-        #contact-page .btn_donate:hover{ background: var(--primary-dark); border-color: var(--primary-dark) }
+
+        #contact-page .btn_donate:hover{
+          background: var(--primary-dark);
+          border-color: var(--primary-dark);
+        }
+
         #contact-page .checkbox_text .form-check-input{
           accent-color: var(--primary);
           border-color: var(--primary-light);
         }
-        #contact-page .checkbox_text .form-check-label{ color:#3b3b3b }
+
+        #contact-page .checkbox_text .form-check-label{
+          color:#3b3b3b;
+        }
+
         #contact-page .right_contact input,
         #contact-page .right_contact textarea{
           border:1px solid rgba(123,44,59,.25);
           border-radius:12px;
           width: 100%;
+          text-align: right;
+          direction: rtl;
         }
+
         #contact-page .right_contact input:focus,
         #contact-page .right_contact textarea:focus{
           outline: none;
           border-color: var(--primary);
           box-shadow: 0 0 0 3px rgba(123,44,59,.12);
         }
-        #contact-page .left_contact h1{ color: var(--primary-dark) }
+
+        #contact-page .left_contact h1{
+          color: var(--primary-dark);
+        }
+
         #contact-page .line_contant{
           height: 4px;
           width: 60px;
@@ -293,21 +318,32 @@ export default function ContactUs() {
           border-radius: 8px;
           margin: 10px 0 18px;
         }
+
         #contact-page .icon_text_contact .imgd{
           width: 46px;
           height: 46px;
           border-radius: 12px;
           background: radial-gradient(240px 80px at 100% 0%, rgba(123,44,59,.15), transparent 60%), #fff;
           border: 1px solid rgba(123,44,59,.2);
-          display:flex;align-items:center;justify-content:center;
+          display:flex;
+          align-items:center;
+          justify-content:center;
           box-shadow: 0 10px 24px rgba(123,44,59,.12);
         }
+
         #contact-page .icon_text_contact .imgd img{
           filter: invert(16%) sepia(35%) saturate(1494%) hue-rotate(314deg) brightness(90%) contrast(93%);
-          width:22px; height:22px;
+          width:22px;
+          height:22px;
         }
-        #contact-page .left_contact a{ color: var(--primary) }
-        #contact-page .left_contact a:hover{ color: var(--primary-dark) }
+
+        #contact-page .left_contact a{
+          color: var(--primary);
+        }
+
+        #contact-page .left_contact a:hover{
+          color: var(--primary-dark);
+        }
 
         #contact-page .body_cotact{
           background: radial-gradient(1200px 300px at 100% 0%, rgba(123,44,59,.08), transparent 60%),
@@ -365,7 +401,9 @@ export default function ContactUs() {
           align-items:center;
           width:100%;
           padding: 12px 0;
+          direction: rtl;
         }
+
         #contact-page .lang-switch select{
           border:1px solid rgba(123,44,59,.25);
           border-radius:10px;
@@ -380,6 +418,7 @@ export default function ContactUs() {
           min-width: 0;
           width: 100%;
         }
+
         #contact-page .mini_hero_slider{
           position: relative;
           width: 100%;
@@ -395,6 +434,7 @@ export default function ContactUs() {
           -webkit-transform: translateZ(0);
           transform: translateZ(0);
         }
+
         #contact-page .contactMiniSwiper{
           width: 100%;
           height: 100%;
@@ -402,10 +442,12 @@ export default function ContactUs() {
           overflow: hidden;
           touch-action: pan-y;
         }
+
         #contact-page .contactMiniSlide{
           width: 100%;
           height: 420px;
         }
+
         #contact-page .contactMiniMedia{
           position: relative;
           width: 100%;
@@ -413,6 +455,7 @@ export default function ContactUs() {
           overflow: hidden;
           background: #fff;
         }
+
         #contact-page .contactMiniMedia > img:first-child{
           width: 100%;
           height: 100%;
@@ -421,6 +464,7 @@ export default function ContactUs() {
           -webkit-user-drag: none;
           user-select: none;
         }
+
         #contact-page .contactMiniShadow{
           position: absolute;
           inset: 0;
@@ -429,6 +473,7 @@ export default function ContactUs() {
           object-fit: cover;
           pointer-events: none;
         }
+
         #contact-page .mini_hero_placeholder{
           min-height: 420px;
           display: flex;
@@ -440,11 +485,13 @@ export default function ContactUs() {
           text-align: center;
           color: var(--primary-dark);
         }
+
         #contact-page .mini_hero_placeholder img{
           max-width: 120px;
           height: auto;
           display: block;
         }
+
         #contact-page .mini_hero_placeholder p{
           margin: 0;
           font-weight: 700;
@@ -460,14 +507,17 @@ export default function ContactUs() {
           color: var(--primary-dark);
           backdrop-filter: blur(6px);
         }
+
         #contact-page .contactMiniSwiper .swiper-button-next:after,
         #contact-page .contactMiniSwiper .swiper-button-prev:after{
           font-size: 14px;
           font-weight: 900;
         }
+
         #contact-page .contactMiniSwiper .swiper-pagination{
           bottom: 10px !important;
         }
+
         #contact-page .contactMiniSwiper .swiper-pagination-bullet{
           width: 9px;
           height: 9px;
@@ -475,6 +525,7 @@ export default function ContactUs() {
           opacity: 1;
           border: 1px solid rgba(123,44,59,.2);
         }
+
         #contact-page .contactMiniSwiper .swiper-pagination-bullet-active{
           background: var(--primary);
         }
