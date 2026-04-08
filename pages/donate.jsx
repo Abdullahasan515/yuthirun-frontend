@@ -1,4 +1,4 @@
-// pages/donate.jsx
+// path: pages/donate.jsx
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
@@ -110,7 +110,7 @@ export default function Donate() {
       fetchFail: 'Projeler alınamadı',
       mustProject: 'Lütfen bir proje seçin',
       mustCountry: 'Lütfen bir ülke seçin',
-      mustRegion: 'Lütfen bir bölge seçin',
+      mustRegion: 'Lütfen bir bölge seçين',
       invalidAmount: 'Lütfen geçerli bir tutar girin',
       donateDetailsTitle: 'Hemen Bağış Yap',
       searchCountry: 'Ülke ara',
@@ -166,11 +166,9 @@ export default function Donate() {
     setForm(f => ({ ...f, amount: val, customAmountToggle: false, customAmount: '' }));
   };
 
-  // تهيئة وترجمة الدول والمناطق والتأكد من توافق البيانات مع Next.js 15 Turbopack
   const localizedCountries = useMemo(() => {
     let safeData = [];
-    
-    // استخراج المصفوفة بأمان لتجنب خطأ map is not a function
+
     if (Array.isArray(CountryRegionData)) {
       safeData = CountryRegionData;
     } else if (CountryRegionData?.default && Array.isArray(CountryRegionData.default)) {
@@ -192,9 +190,7 @@ export default function Donate() {
             const displayNames = new Intl.DisplayNames([lang], { type: 'region' });
             localizedName = displayNames.of(isoCode) || originalName;
           }
-        } catch (e) {
-          // Fallback
-        }
+        } catch (e) {}
 
         return { originalName, isoCode, localizedName, regionsStr };
       })
@@ -668,13 +664,37 @@ export default function Donate() {
       </div >
 
       <style jsx global>{`
+        /* path: pages/donate.jsx */
         :root{
           --brand:#18A558;
           --brand-dark:#128347;
           --brand-light:#35C46F;
           --cream:#EEF9F2;
+          --donate-surface:#ffffff;
+          --donate-surface-soft:#f6fbf7;
+          --donate-border:rgba(24,165,88,.14);
+          --donate-shadow:0 18px 44px rgba(24,165,88,.10);
+          --donate-text:#128347;
+          --donate-text-soft:#476052;
         }
-        .blowline{ height:2px; background:linear-gradient(90deg,var(--brand),var(--brand-light)); border-radius:2px; }
+
+        .blowline{
+          height:2px;
+          background:linear-gradient(90deg,var(--brand),var(--brand-light));
+          border-radius:2px;
+        }
+
+        .body_donate{
+          background:
+            radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.08), transparent 60%),
+            linear-gradient(180deg,#ffffff, var(--cream));
+          border:1px solid var(--donate-border);
+          border-radius:24px;
+          padding:clamp(18px, 2.4vw, 28px);
+          box-shadow:var(--donate-shadow);
+          transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+        }
+
         .body_donate .form-select,
         .body_donate input[type="text"],
         .body_donate input[type="email"],
@@ -684,6 +704,7 @@ export default function Donate() {
           background:#fff;
           color:#128347;
         }
+
         .body_donate .form-select:focus,
         .body_donate input:focus,
         .body_donate textarea:focus{
@@ -691,30 +712,36 @@ export default function Donate() {
           border-color: var(--brand);
           box-shadow: 0 0 0 3px rgba(24,165,88,.12);
         }
+
         .cardsDonate .cardDonate{
           border:1.5px solid rgba(24,165,88,.25);
           background:#fff;
           color:#128347;
         }
+
         .cardsDonate .cardDonate.active{
           border-color: var(--brand);
           background: var(--cream);
           box-shadow: 0 6px 18px rgba(24,165,88,.12);
         }
+
         .cardsDonate .cardDonateS{
           border:1.5px solid rgba(24,165,88,.25);
           background:#fff;
         }
+
         .cardsDonate .cardDonateS.active{
           border-color: var(--brand);
           background: var(--cream);
           box-shadow: 0 6px 18px rgba(24,165,88,.12);
         }
+
         .input-group .input-group-text.textDI{
           background: var(--cream);
           color: var(--brand-dark);
           border-color: rgba(24,165,88,.25);
         }
+
         .btnDonare{
           background: var(--brand);
           color:#fff;
@@ -723,35 +750,65 @@ export default function Donate() {
           padding:12px 18px;
           transition: background .2s ease, transform .1s ease;
         }
-        .btnDonare:hover{ background: var(--brand-dark); transform: translateY(-1px); }
-        .btnDonare:disabled{ background: var(--brand-light); opacity:.7; }
+
+        .btnDonare:hover{
+          background: var(--brand-dark);
+          transform: translateY(-1px);
+        }
+
+        .btnDonare:disabled{
+          background: var(--brand-light);
+          opacity:.7;
+        }
+
         .inputCheck .form-check-input:checked{
           background-color: var(--brand);
           border-color: var(--brand);
         }
-        .inputCheck label{ color:#128347; }
-        .right_donate h2, .leftdonateForm h5, .aboutt h1{ color:#128347; }
+
+        .inputCheck label{
+          color:#128347;
+        }
+
+        .right_donate h2,
+        .leftdonateForm h5,
+        .aboutt h1{
+          color:#128347;
+        }
+
         .phone-container .form-control{
           border-radius: 10px !important;
           border:1px solid rgba(24,165,88,.25) !important;
           height: 44px !important;
         }
+
         .phone-flag-button{
           border:1px solid rgba(24,165,88,.25) !important;
           background:#fff !important;
         }
+
         .phone-dropdown{
           max-height:240px;
         }
+
         .phone-search-center{
           text-align: center !important;
         }
+
         .cardsDonate .cardDonate i,
         .cardsDonate .cardDonateS i{
           color: var(--brand);
         }
-        .imgGC img.imgS{ height:32px }
-        html[dir="rtl"] .react-tel-input .selected-flag{ right:auto; left:0; }
+
+        .imgGC img.imgS{
+          height:32px;
+        }
+
+        html[dir="rtl"] .react-tel-input .selected-flag{
+          right:auto;
+          left:0;
+        }
+
         html[dir="rtl"] .react-tel-input .form-control,
         html[dir="ltr"] .react-tel-input .form-control{
           direction: ltr !important;
@@ -760,7 +817,174 @@ export default function Donate() {
           padding-left: 48px !important;
           padding-right: 12px !important;
         }
-        .aboutt{ background: linear-gradient(180deg, rgba(238,249,242,.65), rgba(255,255,255,.0)); border-radius:16px; padding:8px; }
+
+        .aboutt{
+          background: linear-gradient(180deg, rgba(238,249,242,.65), rgba(255,255,255,.0));
+          border-radius:16px;
+          padding:8px;
+          transition: background .25s ease;
+        }
+
+        html[data-theme='dark'] .aboutt,
+        body[data-theme='dark'] .aboutt,
+        html.dark .aboutt,
+        body.dark .aboutt{
+          background: linear-gradient(180deg, rgba(14,26,18,.88), rgba(14,26,18,.18));
+        }
+
+        html[data-theme='dark'] .body_donate,
+        body[data-theme='dark'] .body_donate,
+        html.dark .body_donate,
+        body.dark .body_donate{
+          background:
+            radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.14), transparent 60%),
+            linear-gradient(180deg, rgba(19,30,23,.96), rgba(11,18,14,.98));
+          border:1px solid rgba(255,255,255,.08);
+          box-shadow:0 20px 48px rgba(0,0,0,.34);
+        }
+
+        html[data-theme='dark'] .body_donate .form-select,
+        html[data-theme='dark'] .body_donate input[type="text"],
+        html[data-theme='dark'] .body_donate input[type="email"],
+        html[data-theme='dark'] .body_donate input[type="number"],
+        html[data-theme='dark'] .body_donate textarea,
+        body[data-theme='dark'] .body_donate .form-select,
+        body[data-theme='dark'] .body_donate input[type="text"],
+        body[data-theme='dark'] .body_donate input[type="email"],
+        body[data-theme='dark'] .body_donate input[type="number"],
+        body[data-theme='dark'] .body_donate textarea,
+        html.dark .body_donate .form-select,
+        html.dark .body_donate input[type="text"],
+        html.dark .body_donate input[type="email"],
+        html.dark .body_donate input[type="number"],
+        html.dark .body_donate textarea,
+        body.dark .body_donate .form-select,
+        body.dark .body_donate input[type="text"],
+        body.dark .body_donate input[type="email"],
+        body.dark .body_donate input[type="number"],
+        body.dark .body_donate textarea{
+          background: rgba(255,255,255,.05);
+          color:#eaf7ef;
+          border:1px solid rgba(255,255,255,.10);
+        }
+
+        html[data-theme='dark'] .body_donate .form-select option,
+        body[data-theme='dark'] .body_donate .form-select option,
+        html.dark .body_donate .form-select option,
+        body.dark .body_donate .form-select option{
+          background:#152019;
+          color:#eaf7ef;
+        }
+
+        html[data-theme='dark'] .body_donate .form-select::placeholder,
+        html[data-theme='dark'] .body_donate input[type="text"]::placeholder,
+        html[data-theme='dark'] .body_donate input[type="email"]::placeholder,
+        html[data-theme='dark'] .body_donate input[type="number"]::placeholder,
+        html[data-theme='dark'] .body_donate textarea::placeholder,
+        body[data-theme='dark'] .body_donate .form-select::placeholder,
+        body[data-theme='dark'] .body_donate input[type="text"]::placeholder,
+        body[data-theme='dark'] .body_donate input[type="email"]::placeholder,
+        body[data-theme='dark'] .body_donate input[type="number"]::placeholder,
+        body[data-theme='dark'] .body_donate textarea::placeholder,
+        html.dark .body_donate .form-select::placeholder,
+        html.dark .body_donate input[type="text"]::placeholder,
+        html.dark .body_donate input[type="email"]::placeholder,
+        html.dark .body_donate input[type="number"]::placeholder,
+        html.dark .body_donate textarea::placeholder,
+        body.dark .body_donate .form-select::placeholder,
+        body.dark .body_donate input[type="text"]::placeholder,
+        body.dark .body_donate input[type="email"]::placeholder,
+        body.dark .body_donate input[type="number"]::placeholder,
+        body.dark .body_donate textarea::placeholder{
+          color:rgba(234,247,239,.72);
+        }
+
+        html[data-theme='dark'] .cardsDonate .cardDonate,
+        html[data-theme='dark'] .cardsDonate .cardDonateS,
+        body[data-theme='dark'] .cardsDonate .cardDonate,
+        body[data-theme='dark'] .cardsDonate .cardDonateS,
+        html.dark .cardsDonate .cardDonate,
+        html.dark .cardsDonate .cardDonateS,
+        body.dark .cardsDonate .cardDonate,
+        body.dark .cardsDonate .cardDonateS{
+          background: rgba(255,255,255,.04);
+          border:1.5px solid rgba(255,255,255,.10);
+          color:#eaf7ef;
+        }
+
+        html[data-theme='dark'] .cardsDonate .cardDonate.active,
+        html[data-theme='dark'] .cardsDonate .cardDonateS.active,
+        body[data-theme='dark'] .cardsDonate .cardDonate.active,
+        body[data-theme='dark'] .cardsDonate .cardDonateS.active,
+        html.dark .cardsDonate .cardDonate.active,
+        html.dark .cardsDonate .cardDonateS.active,
+        body.dark .cardsDonate .cardDonate.active,
+        body.dark .cardsDonate .cardDonateS.active{
+          background: rgba(24,165,88,.18);
+          border-color: rgba(53,196,111,.55);
+          box-shadow: 0 8px 22px rgba(0,0,0,.24);
+        }
+
+        html[data-theme='dark'] .input-group .input-group-text.textDI,
+        body[data-theme='dark'] .input-group .input-group-text.textDI,
+        html.dark .input-group .input-group-text.textDI,
+        body.dark .input-group .input-group-text.textDI{
+          background: rgba(255,255,255,.05);
+          color:#eaf7ef;
+          border-color: rgba(255,255,255,.10);
+        }
+
+        html[data-theme='dark'] .inputCheck label,
+        body[data-theme='dark'] .inputCheck label,
+        html.dark .inputCheck label,
+        body.dark .inputCheck label,
+        html[data-theme='dark'] .right_donate h2,
+        html[data-theme='dark'] .leftdonateForm h5,
+        html[data-theme='dark'] .aboutt h1,
+        body[data-theme='dark'] .right_donate h2,
+        body[data-theme='dark'] .leftdonateForm h5,
+        body[data-theme='dark'] .aboutt h1,
+        html.dark .right_donate h2,
+        html.dark .leftdonateForm h5,
+        html.dark .aboutt h1,
+        body.dark .right_donate h2,
+        body.dark .leftdonateForm h5,
+        body.dark .aboutt h1{
+          color:#ecf8f0;
+        }
+
+        html[data-theme='dark'] .phone-container .form-control,
+        body[data-theme='dark'] .phone-container .form-control,
+        html.dark .phone-container .form-control,
+        body.dark .phone-container .form-control{
+          background: rgba(255,255,255,.05) !important;
+          color:#eaf7ef !important;
+          border:1px solid rgba(255,255,255,.10) !important;
+        }
+
+        html[data-theme='dark'] .phone-flag-button,
+        body[data-theme='dark'] .phone-flag-button,
+        html.dark .phone-flag-button,
+        body.dark .phone-flag-button{
+          background: rgba(255,255,255,.05) !important;
+          border:1px solid rgba(255,255,255,.10) !important;
+        }
+
+        html[data-theme='dark'] .phone-dropdown,
+        body[data-theme='dark'] .phone-dropdown,
+        html.dark .phone-dropdown,
+        body.dark .phone-dropdown{
+          background:#152019 !important;
+          color:#eaf7ef !important;
+          border:1px solid rgba(255,255,255,.10) !important;
+        }
+
+        html[data-theme='dark'] .phone-dropdown .country:hover,
+        body[data-theme='dark'] .phone-dropdown .country:hover,
+        html.dark .phone-dropdown .country:hover,
+        body.dark .phone-dropdown .country:hover{
+          background: rgba(255,255,255,.06) !important;
+        }
       `}</style>
     </>
   );
