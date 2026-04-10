@@ -16,7 +16,9 @@ export default function AboutUs({ cards = [] }) {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
-      try { localStorage.setItem('siteLang', 'ar'); } catch {}
+      try {
+        localStorage.setItem('siteLang', 'ar');
+      } catch {}
     }
   }, [lang]);
 
@@ -154,7 +156,6 @@ export default function AboutUs({ cards = [] }) {
           box-shadow:0 16px 36px rgba(24,165,88,.10);
           padding:16px;
           margin-bottom:18px;
-
           display:flex;
           align-items:center;
           justify-content:space-between;
@@ -229,6 +230,7 @@ export default function AboutUs({ cards = [] }) {
           text-align: right;
         }
 
+        /* path: client/pages/aboutUs.jsx - dark mode fix for card background */
         @media (prefers-color-scheme: dark){
           .aboutt h1{
             color:#E8FFF1;
@@ -238,7 +240,7 @@ export default function AboutUs({ cards = [] }) {
             border:1px solid rgba(53,196,111,.22);
             background:
               radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.14), transparent 60%),
-              #111827;
+              #111827 !important;
             box-shadow:0 16px 36px rgba(0,0,0,.35);
           }
 
@@ -269,7 +271,7 @@ export default function AboutUs({ cards = [] }) {
           border:1px solid rgba(53,196,111,.22);
           background:
             radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.14), transparent 60%),
-            #111827;
+            #111827 !important;
           box-shadow:0 16px 36px rgba(0,0,0,.35);
         }
 
@@ -288,37 +290,6 @@ export default function AboutUs({ cards = [] }) {
           background:#111827;
           color:#F3FFF8;
           border:1px solid rgba(53,196,111,.22);
-          direction: rtl;
-          text-align: right;
-        }
-
-        html:not(.dark) .aboutt h1,
-        body:not(.dark) .aboutt h1{
-          color:var(--primary-dark);
-        }
-
-        html:not(.dark) .card_about,
-        body:not(.dark) .card_about{
-          border:1px solid rgba(24,165,88,.14);
-          background: radial-gradient(1200px 300px at 100% 0%, rgba(24,165,88,.08), transparent 60%), #fff;
-          box-shadow:0 16px 36px rgba(24,165,88,.10);
-        }
-
-        html:not(.dark) .card_about .text_card h1,
-        body:not(.dark) .card_about .text_card h1{
-          color:#163524;
-        }
-
-        html:not(.dark) .card_about .text_card p,
-        body:not(.dark) .card_about .text_card p{
-          color:#476052;
-        }
-
-        html:not(.dark) .lang-switch select,
-        body:not(.dark) .lang-switch select{
-          background:#fff;
-          color:#234433;
-          border:1px solid rgba(24,165,88,.25);
           direction: rtl;
           text-align: right;
         }
