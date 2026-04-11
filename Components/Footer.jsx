@@ -1,6 +1,9 @@
 // path: Components/Footer.jsx
 import { useEffect, useState, useMemo } from 'react';
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
+const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : '/subscribe';
+
 export default function Footer({ footer = {} }) {
   const [subLoading, setSubLoading] = useState(false);
   const [subOk, setSubOk] = useState(false);
@@ -37,17 +40,29 @@ export default function Footer({ footer = {} }) {
   const onSubmitSubscribe = async (e) => {
     e.preventDefault();
     setSubErr('');
+
     const email = e.currentTarget.email.value.trim();
     if (!email) return;
+
     setSubLoading(true);
+
     try {
-      await fetch('/subscribe', {
+      // path: Components/Footer.jsx - تم تعديل الإرسال ليذهب مباشرة إلى الباك الصحيح
+      const response = await fetch(SUBSCRIBE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
+
+      if (!response.ok) {
+        throw new Error(`Subscribe request failed with status ${response.status}`);
+      }
+
       setSubOk(true);
-      try { localStorage.setItem('donationModalSeen', 'true'); } catch {}
+      try {
+        localStorage.setItem('donationModalSeen', 'true');
+      } catch {}
+
       e.currentTarget.reset();
     } catch (err) {
       console.error('Subscription error:', err);
@@ -101,7 +116,13 @@ export default function Footer({ footer = {} }) {
 
                 {!subOk ? (
                   <form onSubmit={onSubmitSubscribe} className="subscribe-form">
-                    <input type="email" name="email" placeholder="البريد الإلكتروني" required disabled={subLoading} />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="البريد الإلكتروني"
+                      required
+                      disabled={subLoading}
+                    />
                     <button type="submit" disabled={subLoading}>
                       {subLoading && <span className="spinner" aria-hidden />}
                       <span>{subLoading ? '...جاري الإرسال' : 'إرسال'}</span>
@@ -123,12 +144,21 @@ export default function Footer({ footer = {} }) {
             <div className="footerall">
               <p>جميع الحقوق محفوظة للموقع الإلكتروني يؤثرون 2025 - 1446هـ</p>
               <div className="alliconbt">
-                {(safeFooter.socialLinks.length ? safeFooter.socialLinks : [
-                  { platform: 'facebook', url: '#' },
-                  { platform: 'twitter', url: '#' },
-                  { platform: 'instagram', url: '#' },
-                ]).map((link) => (
-                  <a key={link.platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={link.platform} title={link.platform}>
+                {(safeFooter.socialLinks.length
+                  ? safeFooter.socialLinks
+                  : [
+                      { platform: 'facebook', url: '#' },
+                      { platform: 'twitter', url: '#' },
+                      { platform: 'instagram', url: '#' },
+                    ]).map((link) => (
+                  <a
+                    key={link.platform}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={link.platform}
+                    title={link.platform}
+                  >
                     {link.platform === 'facebook' && <i className="bx bxl-facebook" />}
                     {link.platform === 'twitter' && <i className="bx bxl-twitter" />}
                     {link.platform === 'instagram' && <i className="bx bxl-instagram" />}
@@ -340,7 +370,6 @@ export default function Footer({ footer = {} }) {
           color: rgba(255,255,255,.92);
         }
 
-        /* تعديل مهم: جعل خلفية صندوق الاشتراك تشبه خلفية التذييل الأم في الوضع الليلي */
         [data-theme='dark'] .footer .leftfooter{
           background:
             radial-gradient(circle at top right, rgba(24,165,88,.14), transparent 32%),
@@ -401,7 +430,6 @@ export default function Footer({ footer = {} }) {
             color: rgba(255,255,255,.92);
           }
 
-          /* نفس التعديل هنا لو النظام نفسه دارك وما تم اختيار light يدويًا */
           :root:not([data-theme='light']) .footer .leftfooter{
             background:
               radial-gradient(circle at top right, rgba(24,165,88,.14), transparent 32%),
