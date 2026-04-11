@@ -13,6 +13,12 @@ const mediaUrl = (u) => {
   return `${API_BASE}/${u}`;
 };
 
+// path: pages/reels.jsx - توحيد معرف الريل لضمان فتح الريل الصحيح سواء كانت البيانات ترجع _id أو id
+const getReelId = (reel, fallback = '') => {
+  if (!reel) return fallback;
+  return reel._id || reel.id || fallback;
+};
+
 function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt = 'auto' } = {}) {
   return new Promise((resolve, reject) => {
     const v = document.createElement('video');
@@ -228,7 +234,7 @@ export default function ReelsPage() {
         setReels(arr);
         const map = {};
         arr.forEach((it) => {
-          const id = it?._id || it?.id;
+          const id = getReelId(it);
           const p  = it?.poster || it?.thumbnail || '';
           if (id && p) map[id] = p;
         });
@@ -262,7 +268,7 @@ export default function ReelsPage() {
 
   const gridItems = useMemo(() => {
     return (reels || []).map((r, i) => {
-      const id = r._id || String(i);
+      const id = getReelId(r, String(i));
       return {
         id,
         src: capturedPosters[id] || mediaUrl(posters[id] || r.poster || r.thumbnail || ''),
@@ -610,7 +616,7 @@ function ReelsFeed({ reels, openId, globalMuted, onToggleMute, onForceMute, fetc
 
   useEffect(() => {
     if (!openId || !containerRef.current) return;
-    const idx = reels.findIndex(r => (r._id || '') === openId);
+    const idx = reels.findIndex((r, i) => getReelId(r, String(i)) === openId);
     if (idx >= 0) {
       const h = window.innerHeight;
       containerRef.current.scrollTo({ top: h * idx, behavior: 'auto' });
@@ -622,7 +628,7 @@ function ReelsFeed({ reels, openId, globalMuted, onToggleMute, onForceMute, fetc
     <div ref={containerRef} className="reels-scroll">
       {reels.map((reel, idx) => (
         <ReelCard
-          key={reel._id || idx}
+          key={getReelId(reel, String(idx))}
           reel={reel}
           index={idx}
           active={idx === activeIndex}
@@ -687,10 +693,10 @@ function ReelCard({ reel, index, active, globalMuted, registerVideo, onToggleMut
 
   useEffect(() => {
     if (videoRef.current) {
-      registerVideo(reel._id || String(index), videoRef.current);
+      registerVideo(getReelId(reel, String(index)), videoRef.current);
       videoRef.current.muted = globalMuted;
     }
-  }, [registerVideo, reel._id, index, globalMuted]);
+  }, [registerVideo, reel._id, reel.id, index, globalMuted]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -856,7 +862,7 @@ function ReelCard({ reel, index, active, globalMuted, registerVideo, onToggleMut
   return (
     <section
       ref={cardRef}
-      data-reel-id={reel._id || String(index)}
+      data-reel-id={getReelId(reel, String(index))}
       data-index={index}
       className="reel-card"
       onPointerDown={handleTap}
@@ -1087,3 +1093,5 @@ function formatCount(n) {
   if (v >= 1e3) return fmt(v / 1e3, v % 1e3 >= 100 ? 1 : 0) + 'K';
   return String(v);
 }
+
+
