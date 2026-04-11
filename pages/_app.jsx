@@ -1,4 +1,4 @@
-// pages/_app.jsx
+// path: pages/_app.jsx
 import Head from 'next/head';
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
@@ -9,12 +9,22 @@ export default function App({ Component, pageProps }) {
   const { footerData = {}, newsTypesObject, searchQuery, pageType } = pageProps;
 
   useEffect(() => {
-    const disableZoom = (e) => { if (e.ctrlKey) e.preventDefault(); };
-    const disableKeyZoom = (e) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=')) e.preventDefault();
+    const disableZoom = (e) => {
+      if (e.ctrlKey) e.preventDefault();
     };
+
+    const disableKeyZoom = (e) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        (e.key === '+' || e.key === '-' || e.key === '=')
+      ) {
+        e.preventDefault();
+      }
+    };
+
     window.addEventListener('wheel', disableZoom, { passive: false });
     window.addEventListener('keydown', disableKeyZoom);
+
     return () => {
       window.removeEventListener('wheel', disableZoom);
       window.removeEventListener('keydown', disableKeyZoom);
@@ -27,7 +37,10 @@ export default function App({ Component, pageProps }) {
         <title>يؤثرون</title>
         <meta name="description" content="منصة يؤثرون للتبرعات" />
         <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -35,7 +48,11 @@ export default function App({ Component, pageProps }) {
       </Head>
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar pageType={pageType} newsTypesObject={newsTypesObject} searchQuery={searchQuery} />
+        <Navbar
+          pageType={pageType}
+          newsTypesObject={newsTypesObject}
+          searchQuery={searchQuery}
+        />
         <main style={{ flex: 1 }}>
           <Component {...pageProps} />
         </main>
@@ -55,8 +72,11 @@ App.getInitialProps = async (appContext) => {
   let footerData = {};
   try {
     const res = await fetch(footerApiUrl);
-    if (res.ok) footerData = await res.json();
-    else console.error('Failed to fetch footerConfig, status:', res.status);
+    if (res.ok) {
+      footerData = await res.json();
+    } else {
+      console.error('Failed to fetch footerConfig, status:', res.status);
+    }
   } catch (err) {
     console.error('Error loading footerConfig:', err);
   }
@@ -65,19 +85,32 @@ App.getInitialProps = async (appContext) => {
     all: 'الكل',
     campaigns: 'الحملات',
     humanCases: 'الحالات الإنسانية',
-    achievements: 'الإنجازات'
+    achievements: 'الإنجازات',
   };
 
   const { pathname, query } = appContext.ctx;
   let pageType = 'index';
-  if (pathname === '/news') {
+
+  if (pathname === '/') {
+    pageType = 'index';
+  } else if (pathname.startsWith('/reels')) {
+    pageType = 'reels';
+  } else if (pathname === '/news/type/[type]' || pathname.startsWith('/news/type/')) {
     const newsType = query.type || 'all';
     pageType = `news-${newsType}`;
+  } else if (pathname === '/news') {
+    const newsType = query.type || 'all';
+    pageType = `news-${newsType}`;
+  } else if (pathname === '/news/[id]') {
+    pageType = 'news-all';
   } else if (pathname.startsWith('/aboutUs')) {
     pageType = 'aboutUs';
   } else if (pathname.startsWith('/contactUs')) {
     pageType = 'contactUs';
+  } else if (pathname.startsWith('/donate')) {
+    pageType = 'donate';
   }
+
   const searchQuery = query.search || '';
 
   return {
@@ -87,7 +120,7 @@ App.getInitialProps = async (appContext) => {
       footerData,
       newsTypesObject,
       pageType,
-      searchQuery
-    }
+      searchQuery,
+    },
   };
 };
