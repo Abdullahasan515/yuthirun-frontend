@@ -504,7 +504,14 @@ export default function Home() {
                 const poster = posters[id] || item.poster || item.thumbnail || null;
                 return (
                   <SwiperSlide key={id}>
-                    <Link href="/reels" legacyBehavior>
+                    <Link
+                      href={{
+                        pathname: '/reels',
+                        query: { mode: 'reels', open: id },
+                      }}
+                      legacyBehavior
+                    >
+                      {/* path: pages/index.jsx - تم تعديل الرابط لفتح نفس الريل المحدد من الرئيسية */}
                       <a>
                         <div className="card cardNews reelCard">
                           <div className="reel-thumb">
@@ -1260,3 +1267,4 @@ html[data-theme='dark']{
     </>
   );
 }
+
