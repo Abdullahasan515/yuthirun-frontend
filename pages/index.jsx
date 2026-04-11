@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
+const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : '/subscribe';
 
 const mediaUrl = (u) => {
   if (!u) return u;
@@ -36,9 +37,9 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
     v.src = proxied;
 
     const clean = () => {
-      try { v.pause(); } catch { }
+      try { v.pause(); } catch {}
       v.removeAttribute('src');
-      try { v.load(); } catch { }
+      try { v.load(); } catch {}
       v.remove();
     };
 
@@ -54,8 +55,11 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
         else if (sr < tr) { sh = vw / tr; sy = (vh - sh) / 2; }
         ctx.drawImage(v, sx, sy, sw, sh, 0, 0, targetW, targetH);
         resolve(c.toDataURL('image/jpeg', 0.82));
-      } catch (e) { reject(e); }
-      finally { clean(); }
+      } catch (e) {
+        reject(e);
+      } finally {
+        clean();
+      }
     };
 
     const onReady = () => {
@@ -63,13 +67,23 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
         ? Math.min(Math.max(v.duration * 0.25, 0.1), Math.max(0, v.duration - 0.2))
         : 0.2;
       const onSeek = () => { v.removeEventListener('seeked', onSeek); draw(); };
-      if (v.duration && !isNaN(v.duration)) { v.currentTime = t; v.addEventListener('seeked', onSeek); }
-      else { draw(); }
+      if (v.duration && !isNaN(v.duration)) {
+        v.currentTime = t;
+        v.addEventListener('seeked', onSeek);
+      } else {
+        draw();
+      }
     };
 
     v.addEventListener('loadeddata', onReady, { once: true });
     v.onerror = (e) => { clean(); reject(e); };
-    setTimeout(() => { try { if (!v.readyState) draw(); } catch (e) { reject(e); } }, 4000);
+    setTimeout(() => {
+      try {
+        if (!v.readyState) draw();
+      } catch (e) {
+        reject(e);
+      }
+    }, 4000);
   });
 }
 
@@ -81,8 +95,10 @@ function useVideoPosters(items, getUrl, { targetW = 960, targetH = 540, captureA
       const id = it?._id || it?.id || String(i);
       if (!id || map[id] || it?.poster || it?.thumbnail || !it?.videoUrl) return;
       capturePosterFromVideo(getUrl(it.videoUrl), { targetW, targetH, captureAt })
-        .then(dataUrl => { if (!cancelled && dataUrl) setMap(prev => ({ ...prev, [id]: dataUrl })); })
-        .catch(() => { });
+        .then((dataUrl) => {
+          if (!cancelled && dataUrl) setMap((prev) => ({ ...prev, [id]: dataUrl }));
+        })
+        .catch(() => {});
     });
     return () => { cancelled = true; };
   }, [items, getUrl, targetW, targetH, captureAt, map]);
@@ -104,6 +120,7 @@ export default function Home() {
     killed: 0, injured: 0, children: 0, women: 0,
     massacres: 0, med: 0, civdef: 0, press: 0, lastDate: ''
   });
+
   const nf = (n) => Number(n || 0).toLocaleString('ar-EG');
   const posters = useVideoPosters(reels, mediaUrl);
 
@@ -136,8 +153,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-        const { data } = await axios.get(`${base}/api/reels?limit=12`);
+        const { data } = await axios.get(`${API_BASE}/api/reels?limit=12`);
         setReels(Array.isArray(data) ? data : []);
       } catch {
         setReels([]);
@@ -156,7 +172,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/home`);
+        const { data } = await axios.get(`${API_BASE}/api/home`);
         setIndexConfig(data.indexConfig);
         setNews(data.news);
       } finally {
@@ -167,15 +183,22 @@ export default function Home() {
   }, []);
 
   const handleModalClose = () => {
-    try { localStorage.setItem("donationModalSeen", "true"); } catch { }
+    try {
+      localStorage.setItem("donationModalSeen", "true");
+    } catch {}
     setShowModal(false);
   };
 
   useEffect(() => {
     if (!router.isReady) return;
     const force = router.query.showModal === '1';
-    if (force) { setShowModal(true); return; }
-    try { if (localStorage.getItem("donationModalSeen")) return; } catch { }
+    if (force) {
+      setShowModal(true);
+      return;
+    }
+    try {
+      if (localStorage.getItem("donationModalSeen")) return;
+    } catch {}
     const timer = setTimeout(() => setShowModal(true), 1500);
     return () => clearTimeout(timer);
   }, [router.isReady, router.query.showModal]);
@@ -250,24 +273,35 @@ export default function Home() {
                 const btn = e.currentTarget.querySelector('button[type="submit"]');
                 const old = btn.textContent;
 
+                if (!email) return;
+
                 btn.disabled = true;
                 btn.textContent = '...جاري الإرسال';
 
                 try {
-                  await fetch("/subscribe", {
+                  // path: pages/index.jsx - تم تعديل الإرسال ليذهب مباشرة إلى الباك الصحيح
+                  const response = await fetch(SUBSCRIBE_ENDPOINT, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email })
                   });
-                } catch { }
 
-                try {
-                  localStorage.setItem("donationModalSeen", "true");
-                } catch { }
+                  if (!response.ok) {
+                    throw new Error(`Subscribe request failed with status ${response.status}`);
+                  }
 
-                btn.disabled = false;
-                btn.textContent = old;
-                setShowModal(false);
+                  try {
+                    localStorage.setItem("donationModalSeen", "true");
+                  } catch {}
+
+                  setShowModal(false);
+                } catch (err) {
+                  console.error('Subscription error:', err);
+                  alert('حدث خطأ أثناء إرسال البريد. حاول مرة أخرى.');
+                } finally {
+                  btn.disabled = false;
+                  btn.textContent = old;
+                }
               }}
               style={{ display: 'grid', gap: 10, marginTop: 8 }}
             >
@@ -484,7 +518,7 @@ export default function Home() {
                               onLoadedMetadata={(e) => {
                                 try {
                                   e.currentTarget.currentTime = 0.1;
-                                } catch { }
+                                } catch {}
                               }}
                               onSeeked={(e) => {
                                 e.currentTarget.pause();
