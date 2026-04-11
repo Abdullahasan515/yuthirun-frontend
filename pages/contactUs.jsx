@@ -84,15 +84,15 @@ export default function ContactUs() {
     fetchHomeSlider();
   }, []);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.privacyCheck) {
       toast.error('يجب الموافقة على سياسة الخصوصية');
@@ -284,16 +284,37 @@ export default function ContactUs() {
           border-color: var(--primary-dark);
         }
 
+        #contact-page .checkbox_text{
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 10px;
+          margin-top: 14px;
+          flex-wrap: wrap;
+        }
+
         #contact-page .checkbox_text .form-check-input{
+          width: 18px;
+          height: 18px;
+          min-width: 18px;
+          margin: 0;
+          padding: 0;
+          appearance: auto;
+          -webkit-appearance: checkbox;
           accent-color: var(--primary);
-          border-color: var(--primary-light);
+          border: 1px solid var(--primary-light);
+          cursor: pointer;
+          flex: 0 0 auto;
         }
 
         #contact-page .checkbox_text .form-check-label{
           color:#3b3b3b;
+          cursor: pointer;
+          margin: 0;
+          line-height: 1.6;
         }
 
-        #contact-page .right_contact input,
+        #contact-page .right_contact input:not([type='checkbox']),
         #contact-page .right_contact textarea{
           border:1px solid rgba(123,44,59,.25);
           border-radius:12px;
@@ -304,12 +325,12 @@ export default function ContactUs() {
           color:#234433;
         }
 
-        #contact-page .right_contact input::placeholder,
+        #contact-page .right_contact input:not([type='checkbox'])::placeholder,
         #contact-page .right_contact textarea::placeholder{
           color:#4a8f69;
         }
 
-        #contact-page .right_contact input:focus,
+        #contact-page .right_contact input:not([type='checkbox']):focus,
         #contact-page .right_contact textarea:focus{
           outline: none;
           border-color: var(--primary);
@@ -629,28 +650,35 @@ export default function ContactUs() {
           box-shadow: 0 22px 54px rgba(0,0,0,.34);
         }
 
-        html[data-theme='dark'] #contact-page .right_contact input,
+        html[data-theme='dark'] #contact-page .right_contact input:not([type='checkbox']),
         html[data-theme='dark'] #contact-page .right_contact textarea,
-        body[data-theme='dark'] #contact-page .right_contact input,
+        body[data-theme='dark'] #contact-page .right_contact input:not([type='checkbox']),
         body[data-theme='dark'] #contact-page .right_contact textarea,
-        html.dark #contact-page .right_contact input,
+        html.dark #contact-page .right_contact input:not([type='checkbox']),
         html.dark #contact-page .right_contact textarea,
-        body.dark #contact-page .right_contact input,
+        body.dark #contact-page .right_contact input:not([type='checkbox']),
         body.dark #contact-page .right_contact textarea{
           background: rgba(255,255,255,.06);
           border: 1px solid rgba(255,255,255,.10);
           color: #eef7f1;
         }
 
-        html[data-theme='dark'] #contact-page .right_contact input::placeholder,
+        html[data-theme='dark'] #contact-page .right_contact input:not([type='checkbox'])::placeholder,
         html[data-theme='dark'] #contact-page .right_contact textarea::placeholder,
-        body[data-theme='dark'] #contact-page .right_contact input::placeholder,
+        body[data-theme='dark'] #contact-page .right_contact input:not([type='checkbox'])::placeholder,
         body[data-theme='dark'] #contact-page .right_contact textarea::placeholder,
-        html.dark #contact-page .right_contact input::placeholder,
+        html.dark #contact-page .right_contact input:not([type='checkbox'])::placeholder,
         html.dark #contact-page .right_contact textarea::placeholder,
-        body.dark #contact-page .right_contact input::placeholder,
+        body.dark #contact-page .right_contact input:not([type='checkbox'])::placeholder,
         body.dark #contact-page .right_contact textarea::placeholder{
           color: rgba(226,240,230,.70);
+        }
+
+        html[data-theme='dark'] #contact-page .checkbox_text .form-check-input,
+        body[data-theme='dark'] #contact-page .checkbox_text .form-check-input,
+        html.dark #contact-page .checkbox_text .form-check-input,
+        body.dark #contact-page .checkbox_text .form-check-input{
+          accent-color: #2dc269;
         }
 
         html[data-theme='dark'] #contact-page .checkbox_text .form-check-label,
