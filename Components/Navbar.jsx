@@ -551,8 +551,8 @@ export default function Navbar({
           text-decoration: none;
           color: #fff;
           font-weight: 800;
-          background: rgba(255,255,255,.1);
-          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.08);
+          border: 1px solid rgba(255,255,255,.12);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           box-shadow: 0 8px 20px rgba(0,0,0,.18);
@@ -562,17 +562,19 @@ export default function Navbar({
           font-size: 18px;
         }
 
+        /* path: components/Navbar.jsx - ستايل خاص بالريلز فقط بدون التأثير على باقي الصفحات */
         body.reels-mode .navbar.reels-navbar {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 90;
-          background:
-            linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.28));
-          border-bottom: 1px solid rgba(255,255,255,.08);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
+          background: linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.22)) !important;
+          background-color: rgba(0,0,0,.42) !important;
+          border-bottom: 1px solid rgba(255,255,255,.08) !important;
+          box-shadow: none !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
         }
 
         body.reels-mode .navbar.reels-navbar .container-fluid {
@@ -582,14 +584,14 @@ export default function Navbar({
         }
 
         body.reels-mode .navbar.reels-navbar .brand-wordmark {
-          color: #fff;
+          color: #fff !important;
           text-shadow: 0 10px 24px rgba(0,0,0,.5);
         }
 
         body.reels-mode .navbar.reels-navbar .theme-toggle {
-          background: rgba(255,255,255,.08);
-          border-color: rgba(255,255,255,.12);
-          color: #fff;
+          background: rgba(255,255,255,.08) !important;
+          border-color: rgba(255,255,255,.12) !important;
+          color: #fff !important;
         }
 
         body.reels-mode .navbar.reels-navbar .navbar-brand {
