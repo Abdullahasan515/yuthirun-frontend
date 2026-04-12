@@ -1,4 +1,4 @@
-//pages/news/[id].jsx
+// pages/news/[id].jsx
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -8,20 +8,20 @@ import "dayjs/locale/ar";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation, Autoplay } from "swiper/modules";
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 dayjs.extend(relativeTime);
 dayjs.locale("ar");
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "";
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
 
 const mediaUrl = (u) => {
   if (!u) return u;
   if (/^https?:\/\//i.test(u)) return u;
-  if (u.startsWith('/')) return `${API_BASE}${u}`;
+  if (u.startsWith("/")) return `${API_BASE}${u}`;
   return `${API_BASE}/${u}`;
 };
 
@@ -367,7 +367,7 @@ const NewsDetailPage = () => {
                         />
                       </div>
 
-                      <Link href={{ pathname: '/donate', query: { newsId: newsItem._id } }} legacyBehavior>
+                      <Link href={{ pathname: "/donate", query: { newsId: newsItem._id } }} legacyBehavior>
                         <a className="donate-btn-link">
                           <span className="span1"></span>
                           <span className="span2"></span>
@@ -443,6 +443,7 @@ const NewsDetailPage = () => {
           --detail-soft: rgba(24,165,88,.10);
           --detail-text: #123222;
           --detail-muted: #557463;
+          --detail-heading-color: var(--detail-text);
         }
 
         .news-detail-page .text-primary{
@@ -469,7 +470,7 @@ const NewsDetailPage = () => {
         .news-detail-page .right_newsdeta h1,
         .news-detail-page .textnewsbetails h1,
         .news-detail-page .newssss h3{
-          color: var(--detail-text) !important;
+          color: var(--detail-heading-color) !important;
         }
 
         .news-detail-page .right_newsdeta h5,
@@ -549,6 +550,19 @@ const NewsDetailPage = () => {
           background-size: 200% 100%;
           border-radius: 999px;
           animation: detail-progress-glow 2s linear infinite;
+        }
+
+        /* pages/news/[id].jsx - dark mode big titles fix */
+        html.dark .news-detail-page,
+        body.dark .news-detail-page,
+        body.dark-mode .news-detail-page,
+        .dark .news-detail-page,
+        .dark-mode .news-detail-page,
+        [data-theme="dark"] .news-detail-page,
+        [data-bs-theme="dark"] .news-detail-page,
+        [data-mode="dark"] .news-detail-page,
+        [theme="dark"] .news-detail-page{
+          --detail-heading-color: #ffffff;
         }
 
         @keyframes detail-progress-glow{
