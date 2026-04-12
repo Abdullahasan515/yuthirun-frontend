@@ -8,8 +8,8 @@ import { useEffect } from 'react';
 export default function App({ Component, pageProps }) {
   const { footerData = {}, newsTypesObject, searchQuery, pageType } = pageProps;
 
-  // path: pages/_app.jsx - جعل صفحة الريلز immersive layout مستقلة بدون Navbar و Footer
-  const isImmersivePage = pageType === 'reels';
+  // path: pages/_app.jsx - في صفحة الريلز نبقي Navbar ظاهر ونخفي Footer فقط
+  const hideFooterOnReels = pageType === 'reels';
 
   useEffect(() => {
     const disableZoom = (e) => {
@@ -51,19 +51,17 @@ export default function App({ Component, pageProps }) {
       </Head>
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        {!isImmersivePage && (
-          <Navbar
-            pageType={pageType}
-            newsTypesObject={newsTypesObject}
-            searchQuery={searchQuery}
-          />
-        )}
+        <Navbar
+          pageType={pageType}
+          newsTypesObject={newsTypesObject}
+          searchQuery={searchQuery}
+        />
 
         <main style={{ flex: 1 }}>
           <Component {...pageProps} />
         </main>
 
-        {!isImmersivePage && <Footer footer={footerData} />}
+        {!hideFooterOnReels && <Footer footer={footerData} />}
       </div>
     </>
   );
@@ -101,7 +99,7 @@ App.getInitialProps = async (appContext) => {
   if (pathname === '/') {
     pageType = 'index';
   } else if (pathname.startsWith('/reels')) {
-    // path: pages/_app.jsx - تعريف صفحة الريلز كصفحة immersive مستقلة
+    // path: pages/_app.jsx - تعريف صفحة الريلز حتى يتعامل معها Navbar/Footer بشكل خاص
     pageType = 'reels';
   } else if (pathname === '/news/type/[type]' || pathname.startsWith('/news/type/')) {
     const newsType = query.type || 'all';
