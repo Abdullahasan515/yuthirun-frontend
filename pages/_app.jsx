@@ -8,6 +8,9 @@ import { useEffect } from 'react';
 export default function App({ Component, pageProps }) {
   const { footerData = {}, newsTypesObject, searchQuery, pageType } = pageProps;
 
+  // path: pages/_app.jsx - جعل صفحة الريلز immersive layout مستقلة بدون Navbar و Footer
+  const isImmersivePage = pageType === 'reels';
+
   useEffect(() => {
     const disableZoom = (e) => {
       if (e.ctrlKey) e.preventDefault();
@@ -48,15 +51,19 @@ export default function App({ Component, pageProps }) {
       </Head>
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar
-          pageType={pageType}
-          newsTypesObject={newsTypesObject}
-          searchQuery={searchQuery}
-        />
+        {!isImmersivePage && (
+          <Navbar
+            pageType={pageType}
+            newsTypesObject={newsTypesObject}
+            searchQuery={searchQuery}
+          />
+        )}
+
         <main style={{ flex: 1 }}>
           <Component {...pageProps} />
         </main>
-        <Footer footer={footerData} />
+
+        {!isImmersivePage && <Footer footer={footerData} />}
       </div>
     </>
   );
@@ -94,6 +101,7 @@ App.getInitialProps = async (appContext) => {
   if (pathname === '/') {
     pageType = 'index';
   } else if (pathname.startsWith('/reels')) {
+    // path: pages/_app.jsx - تعريف صفحة الريلز كصفحة immersive مستقلة
     pageType = 'reels';
   } else if (pathname === '/news/type/[type]' || pathname.startsWith('/news/type/')) {
     const newsType = query.type || 'all';
