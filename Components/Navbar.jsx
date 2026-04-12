@@ -562,25 +562,44 @@ export default function Navbar({
           font-size: 18px;
         }
 
-        /* path: components/Navbar.jsx - ستايل خاص بالريلز فقط بدون التأثير على باقي الصفحات */
+        /* path: components/Navbar.jsx - وضع خاص بالريلز بدون شريط عريض يغطي الفيديو */
         body.reels-mode .navbar.reels-navbar {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 90;
-          background: linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.22)) !important;
-          background-color: rgba(0,0,0,.42) !important;
-          border-bottom: 1px solid rgba(255,255,255,.08) !important;
+          background: transparent !important;
+          background-color: transparent !important;
+          border-bottom: 0 !important;
           box-shadow: none !important;
-          backdrop-filter: blur(14px) !important;
-          -webkit-backdrop-filter: blur(14px) !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          pointer-events: none;
         }
 
         body.reels-mode .navbar.reels-navbar .container-fluid {
-          min-height: 70px;
-          padding-top: max(8px, env(safe-area-inset-top));
-          padding-bottom: 8px;
+          min-height: auto !important;
+          width: 100%;
+          justify-content: space-between;
+          padding-top: max(10px, env(safe-area-inset-top));
+          padding-bottom: 0 !important;
+          padding-left: max(16px, env(safe-area-inset-left));
+          padding-right: max(16px, env(safe-area-inset-right));
+          background: transparent !important;
+        }
+
+        body.reels-mode .navbar.reels-navbar .navbar-brand,
+        body.reels-mode .navbar.reels-navbar .theme-toggle,
+        body.reels-mode .navbar.reels-navbar .reels-home-link,
+        body.reels-mode .navbar.reels-navbar .brand-group,
+        body.reels-mode .navbar.reels-navbar .brand-controls,
+        body.reels-mode .navbar.reels-navbar .reels-nav-actions {
+          pointer-events: auto;
+        }
+
+        body.reels-mode .navbar.reels-navbar .brand-controls {
+          margin-inline-start: 0 !important;
         }
 
         body.reels-mode .navbar.reels-navbar .brand-wordmark {
@@ -589,9 +608,20 @@ export default function Navbar({
         }
 
         body.reels-mode .navbar.reels-navbar .theme-toggle {
-          background: rgba(255,255,255,.08) !important;
-          border-color: rgba(255,255,255,.12) !important;
+          background: rgba(0,0,0,.38) !important;
+          border: 1px solid rgba(255,255,255,.14) !important;
           color: #fff !important;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+
+        body.reels-mode .navbar.reels-navbar .reels-home-link {
+          background: rgba(0,0,0,.38) !important;
+          border: 1px solid rgba(255,255,255,.14) !important;
+          color: #fff !important;
+          box-shadow: 0 8px 20px rgba(0,0,0,.18);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
         }
 
         body.reels-mode .navbar.reels-navbar .navbar-brand {
