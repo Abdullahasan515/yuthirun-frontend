@@ -187,7 +187,7 @@ export default function ReelsPage() {
   }, [router.query.mode]);
 
   useEffect(() => {
-    // path: pages/reels.jsx - تفعيل وضع خاص بالـ body لصفحة الريلز مع الإبقاء على Navbar ظاهر
+    // path: pages/reels.jsx - تفعيل وضع خاص بالـ body لصفحة الريلز مع إبقاء عناصر التنقل كطبقات خفيفة فقط
     document.body.classList.add('reels-mode');
     return () => {
       document.body.classList.remove('reels-mode');
@@ -349,13 +349,13 @@ export default function ReelsPage() {
 
         :global(body.reels-mode) {
           --rail-shift: 0vh;
-          --reels-navbar-h: 78px;
           background: #000;
         }
 
+        /* path: pages/reels.jsx - طبقة التبديل أصبحت خفيفة ولا تعتمد على شريط علوي مرتفع */
         .view-switch {
           position: fixed;
-          top: calc(env(safe-area-inset-top) + var(--reels-navbar-h));
+          top: calc(env(safe-area-inset-top) + 10px);
           inset-inline: 0;
           display: flex;
           gap: 8px;
@@ -397,7 +397,11 @@ export default function ReelsPage() {
 
         @media (max-width: 768px) {
           .view-switch {
-            top: calc(env(safe-area-inset-top) + var(--reels-navbar-h) - 4px);
+            top: calc(env(safe-area-inset-top) + 58px);
+            inset-inline-start: auto;
+            inset-inline-end: calc(env(safe-area-inset-right) + 12px);
+            justify-content: flex-end;
+            gap: 6px;
           }
 
           .view-switch .vs-btn span {
@@ -405,7 +409,7 @@ export default function ReelsPage() {
           }
 
           .view-switch .vs-btn {
-            padding: 7px 10px;
+            padding: 6px;
             border-radius: 12px;
           }
         }
@@ -774,7 +778,7 @@ export default function ReelsPage() {
 
         .grid-root {
           min-height: 100vh;
-          padding-top: calc(env(safe-area-inset-top) + var(--reels-navbar-h) + 54px);
+          padding-top: calc(env(safe-area-inset-top) + 88px);
           padding-bottom: 40px;
           background: radial-gradient(
               1200px 300px at 0% 0%,
