@@ -187,7 +187,7 @@ export default function ReelsPage() {
   }, [router.query.mode]);
 
   useEffect(() => {
-    // path: pages/reels.jsx - صفحة الريلز أصبحت مستقلة ولا تعدّل الـ Navbar العام
+    // path: pages/reels.jsx - تفعيل وضع خاص بالـ body لصفحة الريلز مع الإبقاء على Navbar ظاهر
     document.body.classList.add('reels-mode');
     return () => {
       document.body.classList.remove('reels-mode');
@@ -349,17 +349,18 @@ export default function ReelsPage() {
 
         :global(body.reels-mode) {
           --rail-shift: 0vh;
+          --reels-navbar-h: 78px;
           background: #000;
         }
 
         .view-switch {
           position: fixed;
-          top: calc(env(safe-area-inset-top) + 12px);
+          top: calc(env(safe-area-inset-top) + var(--reels-navbar-h));
           inset-inline: 0;
           display: flex;
           gap: 8px;
           justify-content: center;
-          z-index: 80;
+          z-index: 85;
           pointer-events: none;
         }
 
@@ -396,7 +397,7 @@ export default function ReelsPage() {
 
         @media (max-width: 768px) {
           .view-switch {
-            top: calc(env(safe-area-inset-top) + 10px);
+            top: calc(env(safe-area-inset-top) + var(--reels-navbar-h) - 4px);
           }
 
           .view-switch .vs-btn span {
@@ -773,7 +774,7 @@ export default function ReelsPage() {
 
         .grid-root {
           min-height: 100vh;
-          padding-top: calc(env(safe-area-inset-top) + 78px);
+          padding-top: calc(env(safe-area-inset-top) + var(--reels-navbar-h) + 54px);
           padding-bottom: 40px;
           background: radial-gradient(
               1200px 300px at 0% 0%,
