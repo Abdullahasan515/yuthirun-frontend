@@ -6,36 +6,39 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation, Autoplay } from "swiper/modules";
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : '/subscribe';
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : "/subscribe";
 
 const mediaUrl = (u) => {
   if (!u) return u;
   if (/^https?:\/\//i.test(u)) return u;
-  if (u.startsWith('/')) return `${API_BASE}${u}`;
+  if (u.startsWith("/")) return `${API_BASE}${u}`;
   return `${API_BASE}/${u}`;
 };
 
-// path: pages/index.jsx - helpers added to fix slide button/link rendering
-const isExternalUrl = (url = '') => /^(https?:)?\/\//i.test(String(url).trim());
+// path: pages/index.jsx - helpers for slide button/link rendering
+const isExternalUrl = (url = "") => /^(https?:)?\/\//i.test(String(url).trim());
 
-const normalizeSlideHref = (url = '') => {
-  const value = String(url || '').trim();
+const normalizeSlideHref = (url = "") => {
+  const value = String(url || "").trim();
 
-  if (!value) return '';
+  if (!value) return "";
   if (isExternalUrl(value)) return value;
-  if (value.startsWith('/')) return value;
+  if (value.startsWith("/")) return value;
 
-  return `/${value.replace(/^\/+/, '')}`;
+  return `/${value.replace(/^\/+/, "")}`;
 };
 
-function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt = 'auto' } = {}) {
+function capturePosterFromVideo(
+  src,
+  { targetW = 960, targetH = 540, captureAt = "auto" } = {}
+) {
   return new Promise((resolve, reject) => {
-    const v = document.createElement('video');
+    const v = document.createElement("video");
     const sameOrigin = (() => {
       try {
         return new URL(src, location.href).origin === location.origin;
@@ -45,20 +48,24 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
     })();
     const proxied = sameOrigin ? src : `/api/media-proxy?u=${encodeURIComponent(src)}`;
 
-    v.crossOrigin = 'anonymous';
-    v.preload = 'auto';
+    v.crossOrigin = "anonymous";
+    v.preload = "auto";
     v.muted = true;
     v.defaultMuted = true;
     v.playsInline = true;
-    v.setAttribute('muted', '');
-    v.setAttribute('playsinline', '');
-    v.setAttribute('webkit-playsinline', 'true');
+    v.setAttribute("muted", "");
+    v.setAttribute("playsinline", "");
+    v.setAttribute("webkit-playsinline", "true");
     v.src = proxied;
 
     const clean = () => {
-      try { v.pause(); } catch {}
-      v.removeAttribute('src');
-      try { v.load(); } catch {}
+      try {
+        v.pause();
+      } catch {}
+      v.removeAttribute("src");
+      try {
+        v.load();
+      } catch {}
       v.remove();
     };
 
@@ -68,11 +75,10 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
         const vh = v.videoHeight || 720;
         const tr = targetW / targetH;
         const sr = vw / vh;
-        const c = document.createElement('canvas');
+        const c = document.createElement("canvas");
         c.width = targetW;
         c.height = targetH;
-        const ctx = c.getContext('2d');
-
+        const ctx = c.getContext("2d");
         let sx = 0;
         let sy = 0;
         let sw = vw;
@@ -87,7 +93,7 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
         }
 
         ctx.drawImage(v, sx, sy, sw, sh, 0, 0, targetW, targetH);
-        resolve(c.toDataURL('image/jpeg', 0.82));
+        resolve(c.toDataURL("image/jpeg", 0.82));
       } catch (e) {
         reject(e);
       } finally {
@@ -96,24 +102,25 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
     };
 
     const onReady = () => {
-      const t = (captureAt === 'auto' && v.duration && isFinite(v.duration))
-        ? Math.min(Math.max(v.duration * 0.25, 0.1), Math.max(0, v.duration - 0.2))
-        : 0.2;
+      const t =
+        captureAt === "auto" && v.duration && isFinite(v.duration)
+          ? Math.min(Math.max(v.duration * 0.25, 0.1), Math.max(0, v.duration - 0.2))
+          : 0.2;
 
       const onSeek = () => {
-        v.removeEventListener('seeked', onSeek);
+        v.removeEventListener("seeked", onSeek);
         draw();
       };
 
       if (v.duration && !isNaN(v.duration)) {
         v.currentTime = t;
-        v.addEventListener('seeked', onSeek);
+        v.addEventListener("seeked", onSeek);
       } else {
         draw();
       }
     };
 
-    v.addEventListener('loadeddata', onReady, { once: true });
+    v.addEventListener("loadeddata", onReady, { once: true });
     v.onerror = (e) => {
       clean();
       reject(e);
@@ -129,7 +136,11 @@ function capturePosterFromVideo(src, { targetW = 960, targetH = 540, captureAt =
   });
 }
 
-function useVideoPosters(items, getUrl, { targetW = 960, targetH = 540, captureAt = 'auto' } = {}) {
+function useVideoPosters(
+  items,
+  getUrl,
+  { targetW = 960, targetH = 540, captureAt = "auto" } = {}
+) {
   const [map, setMap] = useState({});
 
   useEffect(() => {
@@ -157,7 +168,7 @@ function useVideoPosters(items, getUrl, { targetW = 960, targetH = 540, captureA
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState('injured');
+  const [activeTab, setActiveTab] = useState("injured");
   const [reels, setReels] = useState([]);
   const [reelsLoading, setReelsLoading] = useState(true);
   const [indexConfig, setIndexConfig] = useState(null);
@@ -166,7 +177,7 @@ export default function Home() {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
   const [gzLoading, setGzLoading] = useState(true);
-  const [gzErr, setGzErr] = useState('');
+  const [gzErr, setGzErr] = useState("");
   const [gzTotals, setGzTotals] = useState({
     killed: 0,
     injured: 0,
@@ -176,35 +187,40 @@ export default function Home() {
     med: 0,
     civdef: 0,
     press: 0,
-    lastDate: ''
+    lastDate: "",
   });
 
-  const nf = (n) => Number(n || 0).toLocaleString('ar-EG');
+  const nf = (n) => Number(n || 0).toLocaleString("ar-EG");
   const posters = useVideoPosters(reels, mediaUrl);
 
   const fetchGz = useCallback(async () => {
     try {
-      setGzErr('');
-      const res = await fetch('https://data.techforpalestine.org/api/v2/casualties_daily.json', { cache: 'no-store' });
+      setGzErr("");
+      const res = await fetch("https://data.techforpalestine.org/api/v2/casualties_daily.json", {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error();
 
       const arr = await res.json();
       const mx = (a, b) => Math.max(...arr.map((r) => Number(r?.[a] ?? r?.[b] ?? 0) || 0));
-      const lastDate = arr.reduce((p, r) => (String(r?.report_date || '') > p ? String(r.report_date) : p), '');
+      const lastDate = arr.reduce(
+        (p, r) => (String(r?.report_date || "") > p ? String(r.report_date) : p),
+        ""
+      );
 
       setGzTotals({
-        killed: mx('killed_cum', 'ext_killed_cum'),
-        injured: mx('injured_cum', 'ext_injured_cum'),
-        children: mx('killed_children_cum', 'ext_killed_children_cum'),
-        women: mx('killed_women_cum', 'ext_killed_women_cum'),
-        massacres: mx('massacres_cum', 'ext_massacres_cum'),
-        med: mx('med_killed_cum', 'ext_med_killed_cum'),
-        civdef: mx('civdef_killed_cum', 'ext_civdef_killed_cum'),
-        press: mx('press_killed_cum', 'ext_press_killed_cum'),
-        lastDate
+        killed: mx("killed_cum", "ext_killed_cum"),
+        injured: mx("injured_cum", "ext_injured_cum"),
+        children: mx("killed_children_cum", "ext_killed_children_cum"),
+        women: mx("killed_women_cum", "ext_killed_women_cum"),
+        massacres: mx("massacres_cum", "ext_massacres_cum"),
+        med: mx("med_killed_cum", "ext_med_killed_cum"),
+        civdef: mx("civdef_killed_cum", "ext_civdef_killed_cum"),
+        press: mx("press_killed_cum", "ext_press_killed_cum"),
+        lastDate,
       });
     } catch {
-      setGzErr('تعذّر جلب بيانات غزة.');
+      setGzErr("تعذّر جلب بيانات غزة.");
     } finally {
       setGzLoading(false);
     }
@@ -253,7 +269,7 @@ export default function Home() {
   useEffect(() => {
     if (!router.isReady) return;
 
-    const force = router.query.showModal === '1';
+    const force = router.query.showModal === "1";
     if (force) {
       setShowModal(true);
       return;
@@ -280,44 +296,44 @@ export default function Home() {
         <div
           onClick={handleModalClose}
           style={{
-            position: 'fixed',
+            position: "fixed",
             inset: 0,
-            background: 'rgba(0, 80, 0, 0.55)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10000
+            background: "rgba(0, 80, 0, 0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10000,
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              position: 'relative',
-              width: 'min(520px,92vw)',
-              background: '#f0fff4',
-              borderRadius: '16px',
-              padding: '22px',
-              boxShadow: '0 20px 60px rgba(0, 100, 0, 0.3)',
-              direction: 'rtl',
-              textAlign: 'center',
-              border: '1px solid #bbf7d0'
+              position: "relative",
+              width: "min(520px,92vw)",
+              background: "#f0fff4",
+              borderRadius: "16px",
+              padding: "22px",
+              boxShadow: "0 20px 60px rgba(0, 100, 0, 0.3)",
+              direction: "rtl",
+              textAlign: "center",
+              border: "1px solid #bbf7d0",
             }}
           >
             <button
               onClick={handleModalClose}
               aria-label="إغلاق"
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 8,
                 insetInlineEnd: 8,
                 width: 36,
                 height: 36,
                 borderRadius: 999,
-                border: 'none',
-                background: '#16a34a',
-                color: '#fff',
-                cursor: 'pointer',
-                fontSize: 20
+                border: "none",
+                background: "#16a34a",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: 20,
               }}
             >
               ×
@@ -327,8 +343,8 @@ export default function Home() {
               <img src="/images/logo.png" alt="شعار يؤثرون" style={{ height: 64 }} />
             </div>
 
-            <h2 style={{ color: '#065f46' }}>تابع آخر الأخبار</h2>
-            <p style={{ color: '#047857' }}>
+            <h2 style={{ color: "#065f46" }}>تابع آخر الأخبار</h2>
+            <p style={{ color: "#047857" }}>
               أدخل بريدك الإلكتروني ليصلك كل جديد، أو يمكنك إغلاق هذه النافذة.
             </p>
 
@@ -342,14 +358,14 @@ export default function Home() {
                 if (!email) return;
 
                 btn.disabled = true;
-                btn.textContent = '...جاري الإرسال';
+                btn.textContent = "...جاري الإرسال";
 
                 try {
                   // path: pages/index.jsx - تم تعديل الإرسال ليذهب مباشرة إلى الباك الصحيح
                   const response = await fetch(SUBSCRIBE_ENDPOINT, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email }),
                   });
 
                   if (!response.ok) {
@@ -362,14 +378,14 @@ export default function Home() {
 
                   setShowModal(false);
                 } catch (err) {
-                  console.error('Subscription error:', err);
-                  alert('حدث خطأ أثناء إرسال البريد. حاول مرة أخرى.');
+                  console.error("Subscription error:", err);
+                  alert("حدث خطأ أثناء إرسال البريد. حاول مرة أخرى.");
                 } finally {
                   btn.disabled = false;
                   btn.textContent = old;
                 }
               }}
-              style={{ display: 'grid', gap: 10, marginTop: 8 }}
+              style={{ display: "grid", gap: 10, marginTop: 8 }}
             >
               <input
                 type="email"
@@ -377,27 +393,27 @@ export default function Home() {
                 placeholder="البريد الإلكتروني"
                 required
                 style={{
-                  padding: '10px 12px',
+                  padding: "10px 12px",
                   borderRadius: 10,
-                  border: '1px solid #86efac',
-                  outline: 'none',
-                  width: '80%',
-                  margin: '0 auto',
-                  display: 'block',
-                  textAlign: 'center'
+                  border: "1px solid #86efac",
+                  outline: "none",
+                  width: "80%",
+                  margin: "0 auto",
+                  display: "block",
+                  textAlign: "center",
                 }}
               />
 
               <button
                 type="submit"
                 style={{
-                  padding: '10px 14px',
+                  padding: "10px 14px",
                   borderRadius: 10,
-                  border: 'none',
-                  background: '#16a34a',
-                  color: '#fff',
+                  border: "none",
+                  background: "#16a34a",
+                  color: "#fff",
                   fontWeight: 700,
-                  cursor: 'pointer'
+                  cursor: "pointer",
                 }}
               >
                 إرسال
@@ -422,9 +438,11 @@ export default function Home() {
             className="swiper mySwiper"
           >
             {indexConfig.slides.map((s, i) => {
-              // path: pages/index.jsx - fixed rendering of slide button/link from admin data
+              // path: pages/index.jsx - render slide button/link and place button lower
               const href = normalizeSlideHref(s.buttonLink);
-              const hasOverlayContent = Boolean(s.heading || s.subheading || (s.buttonText && href));
+              const hasButton = Boolean(s.buttonText && href);
+              const hasTextContent = Boolean(s.heading || s.subheading);
+              const hasOverlay = hasButton || hasTextContent;
 
               return (
                 <SwiperSlide
@@ -435,7 +453,7 @@ export default function Home() {
                   <img
                     className="slide-main-image"
                     src={mediaUrl(s.imagePath)}
-                    alt={s.heading || s.buttonText || 'slide'}
+                    alt={s.heading || s.buttonText || "slide"}
                   />
 
                   {!!s.shadowImage && (
@@ -446,27 +464,30 @@ export default function Home() {
                     />
                   )}
 
-                  {hasOverlayContent && (
+                  {hasOverlay && (
                     <div className="slide-overlay">
-                      {!!s.heading && <h2 className="slide-title">{s.heading}</h2>}
-                      {!!s.subheading && <p className="slide-subtitle">{s.subheading}</p>}
+                      {hasTextContent && (
+                        <div className="slide-content">
+                          {!!s.heading && <h2 className="slide-title">{s.heading}</h2>}
+                          {!!s.subheading && <p className="slide-subtitle">{s.subheading}</p>}
+                        </div>
+                      )}
 
-                      {!!s.buttonText && !!href && (
-                        isExternalUrl(href) ? (
+                      {hasButton &&
+                        (isExternalUrl(href) ? (
                           <a
                             href={href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="slide-btn"
+                            className="slide-btn slide-btn-bottom"
                           >
                             {s.buttonText}
                           </a>
                         ) : (
                           <Link href={href} legacyBehavior>
-                            <a className="slide-btn">{s.buttonText}</a>
+                            <a className="slide-btn slide-btn-bottom">{s.buttonText}</a>
                           </Link>
-                        )
-                      )}
+                        ))}
                     </div>
                   )}
                 </SwiperSlide>
@@ -485,7 +506,7 @@ export default function Home() {
                 <span>إحصائيات غزة</span>
               </div>
               <div className="dt">
-                {gzLoading ? 'جارٍ التحديث…' : gzErr ? '—' : `آخر تحديث: ${gzTotals.lastDate}`}
+                {gzLoading ? "جارٍ التحديث…" : gzErr ? "—" : `آخر تحديث: ${gzTotals.lastDate}`}
               </div>
             </div>
 
@@ -493,30 +514,62 @@ export default function Home() {
               <div className="gz-err">{gzErr}</div>
             ) : (
               <>
-                <div className={`grid ${gzLoading ? 'loading' : ''}`}>
-                  <div className="chip"><i className="bx bxs-heart-circle" /><span>الشهداء</span><strong>{nf(gzTotals.killed)}</strong></div>
-                  <div className="chip"><i className="bx bxs-first-aid" /><span>الجرحى</span><strong>{nf(gzTotals.injured)}</strong></div>
-                  <div className="chip"><i className="bx bxs-baby-carriage" /><span>الأطفال</span><strong>{nf(gzTotals.children)}</strong></div>
-                  <div className="chip"><i className="bx bxs-female-sign" /><span>النساء</span><strong>{nf(gzTotals.women)}</strong></div>
-                  <div className="chip"><i className="bx bxs-error" /><span>المجازر</span><strong>{nf(gzTotals.massacres)}</strong></div>
-                  <div className="chip"><i className="bx bxs-ambulance" /><span>الطبي</span><strong>{nf(gzTotals.med)}</strong></div>
-                  <div className="chip"><i className="bx bxs-hard-hat" /><span>الدفاع المدني</span><strong>{nf(gzTotals.civdef)}</strong></div>
-                  <div className="chip"><i className="bx bxs-microphone" /><span>الصحفيون</span><strong>{nf(gzTotals.press)}</strong></div>
+                <div className={`grid ${gzLoading ? "loading" : ""}`}>
+                  <div className="chip">
+                    <i className="bx bxs-heart-circle" />
+                    <span>الشهداء</span>
+                    <strong>{nf(gzTotals.killed)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-first-aid" />
+                    <span>الجرحى</span>
+                    <strong>{nf(gzTotals.injured)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-baby-carriage" />
+                    <span>الأطفال</span>
+                    <strong>{nf(gzTotals.children)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-female-sign" />
+                    <span>النساء</span>
+                    <strong>{nf(gzTotals.women)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-error" />
+                    <span>المجازر</span>
+                    <strong>{nf(gzTotals.massacres)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-ambulance" />
+                    <span>الطبي</span>
+                    <strong>{nf(gzTotals.med)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-hard-hat" />
+                    <span>الدفاع المدني</span>
+                    <strong>{nf(gzTotals.civdef)}</strong>
+                  </div>
+                  <div className="chip">
+                    <i className="bx bxs-microphone" />
+                    <span>الصحفيون</span>
+                    <strong>{nf(gzTotals.press)}</strong>
+                  </div>
                 </div>
 
                 <div className="gz-card">
                   <div className="gz-header">
                     <div className="gz-date">
-                      {gzLoading ? 'جارٍ تحديث البيانات...' : gzErr ? '—' : `آخر تحديث: ${gzTotals.lastDate}`}
+                      {gzLoading ? "جارٍ تحديث البيانات..." : gzErr ? "—" : `آخر تحديث: ${gzTotals.lastDate}`}
                     </div>
                   </div>
 
                   <div className="gz-tabs" role="tablist" aria-label="إحصائيات">
                     <button
                       role="tab"
-                      aria-selected={activeTab === 'injured'}
-                      className={`gz-tab ${activeTab === 'injured' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('injured')}
+                      aria-selected={activeTab === "injured"}
+                      className={`gz-tab ${activeTab === "injured" ? "active" : ""}`}
+                      onClick={() => setActiveTab("injured")}
                       title="الجرحى والمصابين"
                     >
                       <i className="bx bxs-first-aid-kit" />
@@ -525,9 +578,9 @@ export default function Home() {
 
                     <button
                       role="tab"
-                      aria-selected={activeTab === 'killed'}
-                      className={`gz-tab ${activeTab === 'killed' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('killed')}
+                      aria-selected={activeTab === "killed"}
+                      className={`gz-tab ${activeTab === "killed" ? "active" : ""}`}
+                      onClick={() => setActiveTab("killed")}
                       title="الشهداء"
                     >
                       <i className="bx bxs-heart" />
@@ -539,13 +592,17 @@ export default function Home() {
                     {gzErr ? (
                       <div className="gz-error">{gzErr}</div>
                     ) : gzLoading ? (
-                      <div className="gz-skeleton"><div className="sk-bar" /></div>
+                      <div className="gz-skeleton">
+                        <div className="sk-bar" />
+                      </div>
                     ) : (
                       <>
-                        {activeTab === 'injured' && (
+                        {activeTab === "injured" && (
                           <div className="gz-grid">
                             <div className="gz-metric">
-                              <div className="gz-icon"><i className="bx bxs-first-aid" /></div>
+                              <div className="gz-icon">
+                                <i className="bx bxs-first-aid" />
+                              </div>
                               <div className="gz-val">{nf(gzTotals.injured)}</div>
                               <div className="gz-label">إجمالي الجرحى</div>
                             </div>
@@ -564,10 +621,12 @@ export default function Home() {
                           </div>
                         )}
 
-                        {activeTab === 'killed' && (
+                        {activeTab === "killed" && (
                           <div className="gz-grid">
                             <div className="gz-metric">
-                              <div className="gz-icon"><i className="bx bxs-heart-circle" /></div>
+                              <div className="gz-icon">
+                                <i className="bx bxs-heart-circle" />
+                              </div>
                               <div className="gz-val">{nf(gzTotals.killed)}</div>
                               <div className="gz-label">إجمالي الشهداء</div>
                             </div>
@@ -586,7 +645,9 @@ export default function Home() {
                           </div>
                         )}
 
-                        <div className="gz-note">* في بيانات المصدر تُسجّل أعداد الأطفال والنساء ضمن خانة الضحايا.</div>
+                        <div className="gz-note">
+                          * في بيانات المصدر تُسجّل أعداد الأطفال والنساء ضمن خانة الضحايا.
+                        </div>
                       </>
                     )}
                   </div>
@@ -602,7 +663,9 @@ export default function Home() {
           <div className="textnews">
             <h1>انتقل الى قسم الفيدوهات ورؤية التفاصيل</h1>
             <Link href="/reels" legacyBehavior>
-              <a><h6>عرض الكل</h6></a>
+              <a>
+                <h6>عرض الكل</h6>
+              </a>
             </Link>
           </div>
 
@@ -617,7 +680,7 @@ export default function Home() {
             loop
             className="mySwiper2 reelsSwiper"
           >
-            {(!reelsLoading && reels.length > 0) ? (
+            {!reelsLoading && reels.length > 0 ? (
               reels.map((item, idx) => {
                 const id = item._id || item.id || String(idx);
                 const poster = posters[id] || item.poster || item.thumbnail || null;
@@ -626,18 +689,19 @@ export default function Home() {
                   <SwiperSlide key={id}>
                     <Link
                       href={{
-                        pathname: '/reels',
-                        query: { mode: 'reels', open: id }
+                        pathname: "/reels",
+                        query: { mode: "reels", open: id },
                       }}
                       legacyBehavior
                     >
+                      {/* path: pages/index.jsx - تم تعديل الرابط لفتح نفس الريل المحدد من الرئيسية */}
                       <a>
                         <div className="card cardNews reelCard">
                           <div className="reel-thumb">
                             <video
                               className="card-img-top"
                               src={mediaUrl(item.videoUrl)}
-                              poster={poster || '/images/reel-placeholder.jpg'}
+                              poster={poster || "/images/reel-placeholder.jpg"}
                               preload="metadata"
                               muted
                               playsInline
@@ -649,14 +713,14 @@ export default function Home() {
                               onSeeked={(e) => {
                                 e.currentTarget.pause();
                               }}
-                              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                              style={{ objectFit: "cover", width: "100%", height: "100%" }}
                             />
                           </div>
 
                           <div className="card-body">
-                            <h5 className="card-title">{item.title || 'مقطع قصير'}</h5>
+                            <h5 className="card-title">{item.title || "مقطع قصير"}</h5>
                             <p className="card-text">
-                              {item.description || 'شاهد مقاطع قصيرة مؤثرة من يؤثرون'}
+                              {item.description || "شاهد مقاطع قصيرة مؤثرة من يؤثرون"}
                             </p>
                             <p className="badge bg-primary">شاهد الآن</p>
                           </div>
@@ -699,7 +763,9 @@ export default function Home() {
               <h1>{section.title}</h1>
               {section?.type && (
                 <Link href={`/news/type/${section.type}`} legacyBehavior>
-                  <a><h6>عرض الكل</h6></a>
+                  <a>
+                    <h6>عرض الكل</h6>
+                  </a>
                 </Link>
               )}
             </div>
@@ -743,7 +809,7 @@ export default function Home() {
 
                               <div className="tt2">
                                 <progress className="progress-shooting-star" value={item.donatedAmount} max={item.amount} />
-                                <Link href={{ pathname: '/donate', query: { newsId: item._id } }} legacyBehavior>
+                                <Link href={{ pathname: "/donate", query: { newsId: item._id } }} legacyBehavior>
                                   <a className="donate-btn-link magic-glow">
                                     <span className="span1"></span>
                                     <span className="span2"></span>
@@ -777,7 +843,8 @@ export default function Home() {
           <img src="/images/Group 7814.png" alt="مجموع التبرعات" data-tilt data-tilt-scale="1.1" />
           <h3>مجموع التبرعات</h3>
           <div className="con">
-            <h2 className="counter">{indexConfig.stats.totalDonations}</h2><h2>+</h2>
+            <h2 className="counter">{indexConfig.stats.totalDonations}</h2>
+            <h2>+</h2>
           </div>
         </div>
 
@@ -785,7 +852,8 @@ export default function Home() {
           <img src="/images/Group 7815.png" alt="عدد المتبرعين" data-tilt data-tilt-scale="1.1" />
           <h3>المتبرعين</h3>
           <div className="con">
-            <h2 className="counter">{indexConfig.stats.donorsCount}</h2><h2>+</h2>
+            <h2 className="counter">{indexConfig.stats.donorsCount}</h2>
+            <h2>+</h2>
           </div>
         </div>
 
@@ -793,7 +861,8 @@ export default function Home() {
           <img src="/images/Group 7816.png" alt="المهام المنجزة" data-tilt data-tilt-scale="1.1" />
           <h3>مهام منجزة</h3>
           <div className="con">
-            <h2 className="counter">{indexConfig.stats.tasksCompleted}</h2><h2>+</h2>
+            <h2 className="counter">{indexConfig.stats.tasksCompleted}</h2>
+            <h2>+</h2>
           </div>
         </div>
       </div>
@@ -903,9 +972,7 @@ export default function Home() {
         }
 
         @keyframes rays {
-          to {
-            transform: rotate(360deg) scale(1.02);
-          }
+          to { transform: rotate(360deg) scale(1.02); }
         }
 
         .vh-content{
@@ -922,9 +989,7 @@ export default function Home() {
         }
 
         @media(min-width: 900px){
-          .vh-grid{
-            grid-template-columns: repeat(3, 1fr);
-          }
+          .vh-grid{ grid-template-columns: repeat(3, 1fr); }
         }
 
         .glass-card{
@@ -967,20 +1032,9 @@ export default function Home() {
           margin: 8px 0 16px;
         }
 
-        .vh-bar.cyan{
-          background: linear-gradient(90deg, #67e8f9, #22d3ee);
-          box-shadow:0 6px 16px rgba(34,211,238,.35);
-        }
-
-        .vh-bar.emerald{
-          background: linear-gradient(90deg, #6ee7b7, #10b981);
-          box-shadow:0 6px 16px rgba(16,185,129,.35);
-        }
-
-        .vh-bar.amber{
-          background: linear-gradient(90deg, #fcd34d, #f59e0b);
-          box-shadow:0 6px 16px rgba(245,158,11,.35);
-        }
+        .vh-bar.cyan{ background: linear-gradient(90deg, #67e8f9, #22d3ee); box-shadow:0 6px 16px rgba(34,211,238,.35); }
+        .vh-bar.emerald{ background: linear-gradient(90deg, #6ee7b7, #10b981); box-shadow:0 6px 16px rgba(16,185,129,.35); }
+        .vh-bar.amber{ background: linear-gradient(90deg, #fcd34d, #f59e0b); box-shadow:0 6px 16px rgba(245,158,11,.35); }
 
         .vh-text{
           color:#fff;
@@ -1100,7 +1154,7 @@ export default function Home() {
           box-shadow:0 10px 24px rgba(0,0,0,.35);
         }
 
-        /* path: pages/index.jsx - styles added for slide button/link overlay */
+        /* path: pages/index.jsx - slide overlay and button position fix */
         .slide-item{
           position:relative;
           overflow:hidden;
@@ -1128,20 +1182,20 @@ export default function Home() {
           position:absolute;
           inset:0;
           z-index:3;
+          direction:rtl;
+          pointer-events:none;
+        }
+
+        .slide-content{
+          position:absolute;
+          top:50%;
+          right:clamp(24px, 4vw, 56px);
+          transform:translateY(-50%);
+          max-width:min(42vw, 560px);
           display:flex;
           flex-direction:column;
-          justify-content:center;
-          align-items:flex-start;
           gap:14px;
-          padding:40px;
-          direction:rtl;
           text-align:right;
-          background: linear-gradient(
-            90deg,
-            rgba(0, 0, 0, 0.55) 0%,
-            rgba(0, 0, 0, 0.28) 40%,
-            rgba(0, 0, 0, 0.05) 100%
-          );
         }
 
         .slide-title{
@@ -1150,6 +1204,7 @@ export default function Home() {
           font-size:clamp(24px, 4vw, 42px);
           font-weight:800;
           line-height:1.3;
+          text-shadow:0 2px 12px rgba(0,0,0,.28);
         }
 
         .slide-subtitle{
@@ -1158,6 +1213,7 @@ export default function Home() {
           font-size:clamp(14px, 2vw, 18px);
           line-height:1.8;
           max-width:650px;
+          text-shadow:0 1px 8px rgba(0,0,0,.22);
         }
 
         .slide-btn{
@@ -1173,6 +1229,7 @@ export default function Home() {
           font-weight:700;
           transition:background .2s ease, transform .2s ease;
           box-shadow:0 10px 24px rgba(0,0,0,.22);
+          pointer-events:auto;
         }
 
         .slide-btn:hover{
@@ -1180,16 +1237,28 @@ export default function Home() {
           transform:translateY(-1px);
         }
 
+        .slide-btn-bottom{
+          position:absolute;
+          right:48px;
+          bottom:90px;
+        }
+
         @media (max-width: 768px){
-          .slide-overlay{
-            padding:20px;
-            align-items:center;
+          .slide-content{
+            right:20px;
+            left:20px;
+            top:50%;
+            transform:translateY(-50%);
+            max-width:none;
             text-align:center;
-            background: linear-gradient(
-              180deg,
-              rgba(0, 0, 0, 0.45) 0%,
-              rgba(0, 0, 0, 0.35) 100%
-            );
+            align-items:center;
+          }
+
+          .slide-btn-bottom{
+            right:20px;
+            bottom:35px;
+            min-width:120px;
+            padding:10px 18px;
           }
         }
 
@@ -1255,15 +1324,11 @@ export default function Home() {
         }
 
         @media (min-width:640px){
-          .grid{
-            grid-template-columns: repeat(4, minmax(0,1fr));
-          }
+          .grid{ grid-template-columns: repeat(4, minmax(0,1fr)); }
         }
 
         @media (min-width:1024px){
-          .grid{
-            grid-template-columns: repeat(8, minmax(0,1fr));
-          }
+          .grid{ grid-template-columns: repeat(8, minmax(0,1fr)); }
         }
 
         .chip{
@@ -1412,11 +1477,7 @@ export default function Home() {
           animation: sh 1.2s infinite linear;
         }
 
-        @keyframes sh {
-          to{
-            background-position: -200% 0;
-          }
-        }
+        @keyframes sh { to{ background-position: -200% 0 } }
 
         .gz-grid{
           display:grid;
@@ -1511,9 +1572,7 @@ export default function Home() {
           text-decoration:none;
         }
 
-        .donate-btn-link:hover{
-          background:var(--primary-dark);
-        }
+        .donate-btn-link:hover{ background:var(--primary-dark) }
 
         .progress-shooting-star{
           accent-color: green;
