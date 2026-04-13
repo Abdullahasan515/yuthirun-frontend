@@ -2,11 +2,9 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import newsTypes from '@/constants/newsTypes';
 
 export default function Navbar({
   pageType,
-  newsTypesObject,
   searchQuery: initialSearch = '',
 }) {
   const router = useRouter();
@@ -24,7 +22,6 @@ export default function Navbar({
       home: 'الصفحة الرئيسية',
       videos: 'الفيديوهات',
       posts: 'المنشورات',
-      postsBrand: 'منشورات يؤثرون',
       about: 'من نحن',
       contact: 'تواصل معنا',
       donate: 'تبرع الآن',
@@ -90,9 +87,6 @@ export default function Navbar({
 
     return safePageType.replace(/^news-/, '') === key;
   };
-
-  const isBrandPostsActive =
-    safePageType.startsWith('news-') && safePageType !== 'news-all';
 
   const performSearch = () => {
     const q = searchQuery.trim();
@@ -216,39 +210,6 @@ export default function Navbar({
                   >
                     {L.posts}
                   </Link>
-                </li>
-
-                <li className="nav-item dropdown">
-                  <Link
-                    href="#"
-                    className={`nav-link dropdown-toggle ${isBrandPostsActive ? 'active' : ''}`}
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {L.postsBrand}
-                  </Link>
-
-                  <ul className="dropdown-menu">
-                    {Object.entries(newsTypes).map(
-                      ([key, label]) =>
-                        key !== 'all' && (
-                          <li key={key}>
-                            <Link
-                              href={{
-                                pathname: `/news/type/${key}`,
-                                query: { ...(router.query || {}), lang: 'ar' },
-                              }}
-                              className={`dropdown-item ${
-                                safePageType === `news-${key}` ? 'active' : ''
-                              }`}
-                            >
-                              {label}
-                            </Link>
-                          </li>
-                        )
-                    )}
-                  </ul>
                 </li>
 
                 <li className="nav-item">
