@@ -12,7 +12,7 @@ import 'swiper/css/navigation';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
 
-// path: pages/contactUs.jsx - إرسال نموذج التواصل عبر Vercel API route المحلي
+// path: pages/contactUs.jsx - إرسال النموذج عبر Vercel API route المحلي
 const CONTACT_FORM_ENDPOINT = '/api/contactUs';
 
 const mediaUrl = (u) => {
@@ -60,7 +60,6 @@ export default function ContactUs() {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
-
       try {
         localStorage.setItem('site_lang', 'ar');
       } catch {}
@@ -71,11 +70,9 @@ export default function ContactUs() {
     async function fetchContactData() {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/contactUs`);
-
         if (!res.ok) {
           throw new Error(`فشل في جلب بيانات التواصل (الحالة: ${res.status})`);
         }
-
         const data = await res.json();
         setContactData(data);
       } catch (err) {
@@ -83,7 +80,6 @@ export default function ContactUs() {
         setError('فشل في تحميل بيانات التواصل');
       }
     }
-
     fetchContactData();
   }, []);
 
@@ -91,31 +87,27 @@ export default function ContactUs() {
     async function fetchHomeSlider() {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/home`);
-
         if (!res.ok) {
           throw new Error(`فشل في جلب بيانات السلايدر (الحالة: ${res.status})`);
         }
-
         const data = await res.json();
         setIndexConfig(data.indexConfig || null);
       } catch (err) {
         console.error('Error fetching slider data:', err);
       }
     }
-
     fetchHomeSlider();
   }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setForm((f) => ({
       ...f,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
-  // path: pages/contactUs.jsx - إرسال النموذج مع لودينق ونجاح وفشل واضحين
+  // path: pages/contactUs.jsx - الإرسال الحقيقي عبر Vercel
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -129,14 +121,14 @@ export default function ContactUs() {
       return;
     }
 
-    const trimmedForm = {
+    const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
       message: form.message.trim(),
       privacyCheck: form.privacyCheck,
     };
 
-    if (!trimmedForm.name || !trimmedForm.email || !trimmedForm.message) {
+    if (!payload.name || !payload.email || !payload.message) {
       const msg = 'يرجى تعبئة جميع الحقول المطلوبة';
       setError(msg);
       toast.error(msg);
@@ -150,13 +142,12 @@ export default function ContactUs() {
         fetch(CONTACT_FORM_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(trimmedForm),
+          body: JSON.stringify(payload),
         }),
         20000
       );
 
       let data = null;
-
       try {
         data = await res.json();
       } catch {
@@ -187,13 +178,11 @@ export default function ContactUs() {
       toast.success(data?.msg || 'تم إرسال رسالتك بنجاح');
     } catch (err) {
       console.error('Error submitting form:', err);
-
-      const message =
+      const msg =
         err?.message || 'تعذر إرسال الرسالة حاليًا، يرجى المحاولة مرة أخرى';
-
       setSuccess(false);
-      setError(message);
-      toast.error(message);
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -252,7 +241,6 @@ export default function ContactUs() {
                     onChange={handleChange}
                     disabled={submitting}
                   />
-
                   <input
                     type="email"
                     name="email"
@@ -291,18 +279,11 @@ export default function ContactUs() {
 
                 <button
                   type="submit"
-                  className={`btn_donate ${submitting ? 'is-loading' : ''}`}
+                  className="btn_donate"
                   disabled={submitting}
                   aria-busy={submitting ? 'true' : 'false'}
                 >
-                  {submitting ? (
-                    <>
-                      <span className="btn-spinner" aria-hidden="true"></span>
-                      جاري الإرسال...
-                    </>
-                  ) : (
-                    'إرسال'
-                  )}
+                  {submitting ? 'جاري الإرسال...' : 'إرسال'}
                 </button>
               </form>
             </div>
@@ -322,11 +303,7 @@ export default function ContactUs() {
                     className="contactMiniSwiper"
                   >
                     {indexConfig.slides.map((s, i) => (
-                      <SwiperSlide
-                        key={i}
-                        className="contactMiniSlide"
-                        data-duration={s.duration}
-                      >
+                      <SwiperSlide key={i} className="contactMiniSlide" data-duration={s.duration}>
                         <div className="contactMiniMedia">
                           <img src={mediaUrl(s.imagePath)} alt={`slide-${i + 1}`} />
                           {s.shadowImage ? (
@@ -408,10 +385,6 @@ export default function ContactUs() {
           padding: 10px 16px;
           font-weight: 800;
           transition: .2s ease;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
           min-width: 140px;
         }
 
@@ -423,22 +396,6 @@ export default function ContactUs() {
         #contact-page .btn_donate:disabled{
           opacity: .75;
           cursor: not-allowed;
-        }
-
-        #contact-page .btn-spinner{
-          width: 18px;
-          height: 18px;
-          border-radius: 999px;
-          border: 2px solid rgba(255,255,255,.35);
-          border-top-color: #fff;
-          display: inline-block;
-          animation: contact-spin .8s linear infinite;
-        }
-
-        @keyframes contact-spin{
-          to{
-            transform: rotate(360deg);
-          }
         }
 
         #contact-page .checkbox_text{
@@ -484,8 +441,8 @@ export default function ContactUs() {
 
         #contact-page .right_contact input:not([type='checkbox']):disabled,
         #contact-page .right_contact textarea:disabled{
-          opacity: .8;
-          cursor: not-allowed;
+          opacity:.8;
+          cursor:not-allowed;
         }
 
         #contact-page .right_contact input:not([type='checkbox'])::placeholder,
