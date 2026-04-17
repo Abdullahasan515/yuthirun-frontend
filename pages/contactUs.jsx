@@ -12,12 +12,24 @@ import 'swiper/css/navigation';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
 
+// path: pages/contactUs.jsx - إرسال نموذج التواصل عبر Vercel API route المحلي
+const CONTACT_FORM_ENDPOINT = '/api/contactUs';
+
 const mediaUrl = (u) => {
   if (!u) return u;
   if (/^https?:\/\//i.test(u)) return u;
   if (u.startsWith('/')) return `${API_BASE}${u}`;
   return `${API_BASE}/${u}`;
 };
+
+function withTimeout(promise, ms = 20000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('انتهت مهلة الاتصال، حاول مرة أخرى')), ms)
+    ),
+  ]);
+}
 
 export default function ContactUs() {
   const [form, setForm] = useState({
@@ -26,15 +38,18 @@ export default function ContactUs() {
     message: '',
     privacyCheck: false,
   });
+
   const [contactData, setContactData] = useState({
     phone: '',
     email: '',
     address: '',
     socialItems: [],
   });
+
   const [indexConfig, setIndexConfig] = useState(null);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const [lang, setLang] = useState('ar');
 
   useEffect(() => {
@@ -45,6 +60,7 @@ export default function ContactUs() {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = 'ar';
       document.documentElement.dir = 'rtl';
+
       try {
         localStorage.setItem('site_lang', 'ar');
       } catch {}
@@ -55,9 +71,11 @@ export default function ContactUs() {
     async function fetchContactData() {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/contactUs`);
+
         if (!res.ok) {
           throw new Error(`فشل في جلب بيانات التواصل (الحالة: ${res.status})`);
         }
+
         const data = await res.json();
         setContactData(data);
       } catch (err) {
@@ -65,6 +83,7 @@ export default function ContactUs() {
         setError('فشل في تحميل بيانات التواصل');
       }
     }
+
     fetchContactData();
   }, []);
 
@@ -72,49 +91,111 @@ export default function ContactUs() {
     async function fetchHomeSlider() {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/home`);
+
         if (!res.ok) {
           throw new Error(`فشل في جلب بيانات السلايدر (الحالة: ${res.status})`);
         }
+
         const data = await res.json();
         setIndexConfig(data.indexConfig || null);
       } catch (err) {
         console.error('Error fetching slider data:', err);
       }
     }
+
     fetchHomeSlider();
   }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setForm((f) => ({
       ...f,
       [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
+  // path: pages/contactUs.jsx - إرسال النموذج مع لودينق ونجاح وفشل واضحين
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (submitting) return;
+
+    setSuccess(false);
+    setError(null);
+
     if (!form.privacyCheck) {
       toast.error('يجب الموافقة على سياسة الخصوصية');
       return;
     }
+
+    const trimmedForm = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+      privacyCheck: form.privacyCheck,
+    };
+
+    if (!trimmedForm.name || !trimmedForm.email || !trimmedForm.message) {
+      const msg = 'يرجى تعبئة جميع الحقول المطلوبة';
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/contactUs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSuccess(true);
-        setError(null);
-        setForm({ name: '', email: '', message: '', privacyCheck: false });
-      } else {
-        throw new Error(data.error || 'حدث خطأ أثناء إرسال الرسالة');
+      setSubmitting(true);
+
+      const res = await withTimeout(
+        fetch(CONTACT_FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(trimmedForm),
+        }),
+        20000
+      );
+
+      let data = null;
+
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
       }
+
+      if (!res.ok) {
+        throw new Error(
+          data?.error ||
+            data?.msg ||
+            `حدث خطأ أثناء إرسال الرسالة (الحالة: ${res.status})`
+        );
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || data?.msg || 'حدث خطأ أثناء إرسال الرسالة');
+      }
+
+      setSuccess(true);
+      setError(null);
+      setForm({
+        name: '',
+        email: '',
+        message: '',
+        privacyCheck: false,
+      });
+
+      toast.success(data?.msg || 'تم إرسال رسالتك بنجاح');
     } catch (err) {
       console.error('Error submitting form:', err);
-      setError(err.message);
+
+      const message =
+        err?.message || 'تعذر إرسال الرسالة حاليًا، يرجى المحاولة مرة أخرى';
+
+      setSuccess(false);
+      setError(message);
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -146,8 +227,17 @@ export default function ContactUs() {
         <section className="aboutt">
           <h1>اتصل بنا</h1>
 
-          {error && <div style={{ color: 'red', marginBottom: 20 }}>{error}</div>}
-          {success && <div style={{ color: 'green', marginBottom: 20 }}>تم إرسال رسالتك بنجاح</div>}
+          {error && (
+            <div className="status-box status-error" role="alert">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="status-box status-success" role="status">
+              تم إرسال رسالتك بنجاح
+            </div>
+          )}
 
           <div className="body_cotact">
             <div className="right_contact">
@@ -160,7 +250,9 @@ export default function ContactUs() {
                     required
                     value={form.name}
                     onChange={handleChange}
+                    disabled={submitting}
                   />
+
                   <input
                     type="email"
                     name="email"
@@ -168,6 +260,7 @@ export default function ContactUs() {
                     required
                     value={form.email}
                     onChange={handleChange}
+                    disabled={submitting}
                   />
                 </div>
 
@@ -178,6 +271,7 @@ export default function ContactUs() {
                   required
                   value={form.message}
                   onChange={handleChange}
+                  disabled={submitting}
                 />
 
                 <div className="checkbox_text">
@@ -188,14 +282,27 @@ export default function ContactUs() {
                     className="form-check-input"
                     checked={form.privacyCheck}
                     onChange={handleChange}
+                    disabled={submitting}
                   />
                   <label htmlFor="privacyCheck" className="form-check-label">
                     أوافق على سياسة الخصوصية
                   </label>
                 </div>
 
-                <button type="submit" className="btn_donate">
-                  إرسال
+                <button
+                  type="submit"
+                  className={`btn_donate ${submitting ? 'is-loading' : ''}`}
+                  disabled={submitting}
+                  aria-busy={submitting ? 'true' : 'false'}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="btn-spinner" aria-hidden="true"></span>
+                      جاري الإرسال...
+                    </>
+                  ) : (
+                    'إرسال'
+                  )}
                 </button>
               </form>
             </div>
@@ -215,7 +322,11 @@ export default function ContactUs() {
                     className="contactMiniSwiper"
                   >
                     {indexConfig.slides.map((s, i) => (
-                      <SwiperSlide key={i} className="contactMiniSlide" data-duration={s.duration}>
+                      <SwiperSlide
+                        key={i}
+                        className="contactMiniSlide"
+                        data-duration={s.duration}
+                      >
                         <div className="contactMiniMedia">
                           <img src={mediaUrl(s.imagePath)} alt={`slide-${i + 1}`} />
                           {s.shadowImage ? (
@@ -269,6 +380,26 @@ export default function ContactUs() {
           color: var(--primary-dark);
         }
 
+        #contact-page .status-box{
+          margin-bottom: 20px;
+          border-radius: 12px;
+          padding: 14px 16px;
+          font-weight: 700;
+          line-height: 1.8;
+        }
+
+        #contact-page .status-success{
+          color: #116b3a;
+          background: rgba(45, 194, 105, .10);
+          border: 1px solid rgba(45, 194, 105, .24);
+        }
+
+        #contact-page .status-error{
+          color: #b42318;
+          background: rgba(220, 38, 38, .08);
+          border: 1px solid rgba(220, 38, 38, .18);
+        }
+
         #contact-page .btn_donate{
           background: var(--primary);
           border: 1px solid var(--primary);
@@ -277,11 +408,37 @@ export default function ContactUs() {
           padding: 10px 16px;
           font-weight: 800;
           transition: .2s ease;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          min-width: 140px;
         }
 
         #contact-page .btn_donate:hover{
           background: var(--primary-dark);
           border-color: var(--primary-dark);
+        }
+
+        #contact-page .btn_donate:disabled{
+          opacity: .75;
+          cursor: not-allowed;
+        }
+
+        #contact-page .btn-spinner{
+          width: 18px;
+          height: 18px;
+          border-radius: 999px;
+          border: 2px solid rgba(255,255,255,.35);
+          border-top-color: #fff;
+          display: inline-block;
+          animation: contact-spin .8s linear infinite;
+        }
+
+        @keyframes contact-spin{
+          to{
+            transform: rotate(360deg);
+          }
         }
 
         #contact-page .checkbox_text{
@@ -323,6 +480,12 @@ export default function ContactUs() {
           direction: rtl;
           background:#f2f4f1;
           color:#234433;
+        }
+
+        #contact-page .right_contact input:not([type='checkbox']):disabled,
+        #contact-page .right_contact textarea:disabled{
+          opacity: .8;
+          cursor: not-allowed;
         }
 
         #contact-page .right_contact input:not([type='checkbox'])::placeholder,
@@ -637,6 +800,24 @@ export default function ContactUs() {
         html.dark #contact-page .aboutt h1,
         body.dark #contact-page .aboutt h1{
           color:#f5f7f6;
+        }
+
+        html[data-theme='dark'] #contact-page .status-success,
+        body[data-theme='dark'] #contact-page .status-success,
+        html.dark #contact-page .status-success,
+        body.dark #contact-page .status-success{
+          background: rgba(45, 194, 105, .12);
+          border-color: rgba(45, 194, 105, .24);
+          color: #d7ffe7;
+        }
+
+        html[data-theme='dark'] #contact-page .status-error,
+        body[data-theme='dark'] #contact-page .status-error,
+        html.dark #contact-page .status-error,
+        body.dark #contact-page .status-error{
+          background: rgba(220, 38, 38, .12);
+          border-color: rgba(220, 38, 38, .20);
+          color: #ffd6d6;
         }
 
         html[data-theme='dark'] #contact-page .body_cotact,
