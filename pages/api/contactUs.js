@@ -43,6 +43,38 @@ async function saveMessageInBackend(payload) {
   }
 }
 
+// path: pages/api/contactUs.js - شعار نصي مطابق للهيدر بدل الصورة
+function renderEmailWordmark() {
+  return `
+    <div style="text-align:center; margin-bottom:20px;">
+      <span
+        style="
+          display:inline-block;
+          font-family:'LateefCustom','Ping AR LT','Noto Naskh Arabic','Amiri',serif;
+          font-size:52px;
+          line-height:1;
+          color:#18A558;
+          text-decoration:none;
+          text-shadow:0 10px 24px rgba(0,0,0,.08);
+          white-space:nowrap;
+          font-weight:700;
+        "
+      >
+        يؤثرون
+      </span>
+    </div>
+  `;
+}
+
+function escapeHtml(value = '') {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({
@@ -82,12 +114,22 @@ export default async function handler(req, res) {
     const subject = `رسالة جديدة من ${safeName}`;
     const text = `الاسم: ${safeName}\nالبريد: ${safeEmail}\n\n${safeMessage}`;
     const html = `
-      <div dir="rtl" style="font-family: Arial, sans-serif; line-height: 1.9; color: #1f2937;">
-        <h2 style="margin-bottom: 16px;">رسالة جديدة من صفحة تواصل معنا</h2>
-        <p><strong>الاسم:</strong> ${safeName}</p>
-        <p><strong>البريد الإلكتروني:</strong> ${safeEmail}</p>
-        <p><strong>الرسالة:</strong></p>
-        <div style="white-space: pre-wrap; background: #f8fafc; padding: 12px; border-radius: 8px;">${safeMessage}</div>
+      <div dir="rtl" style="background:#f5f5f5; padding:20px; font-family:'Segoe UI', Tahoma, sans-serif;">
+        <div style="max-width:600px; margin:auto; background:white; border-radius:8px; padding:30px; box-shadow:0 0 10px rgba(0,0,0,0.05);">
+          ${renderEmailWordmark()}
+
+          <div style="font-size:16px; line-height:1.8; color:#333;">
+            <p><strong>الاسم:</strong> ${escapeHtml(safeName)}</p>
+            <p><strong>البريد الإلكتروني:</strong> ${escapeHtml(safeEmail)}</p>
+            <p><strong>الرسالة:</strong></p>
+            <div style="white-space: pre-wrap; background: #f8fafc; padding: 12px; border-radius: 8px;">${escapeHtml(safeMessage)}</div>
+          </div>
+
+          <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
+          <p style="font-size:13px; color:#888; text-align:center;">
+            هذه الرسالة وردت من صفحة تواصل معنا في موقع يؤثرون
+          </p>
+        </div>
       </div>
     `;
 
