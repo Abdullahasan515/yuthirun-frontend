@@ -43,7 +43,7 @@ export default function Success() {
         setDonation(successData);
         setLoading(false);
 
-        // path: client/pages/src/success.jsx - إرسال رسالة الشكر عبر Vercel API المحلي بدل Railway
+        // path: client/pages/src/success.jsx - إرسال رسالة الشكر عبر Vercel API المحلي
         if (!emailTriggeredRef.current) {
           emailTriggeredRef.current = true;
           setEmailStatus('sending');
@@ -102,7 +102,7 @@ export default function Success() {
 
       <div className="success-page">
         <div className="success-card">
-          {/* path: client/pages/src/success.jsx - شعار نصي مطابق للهيدر */}
+          {/* path: client/pages/src/success.jsx - واجهة الصفحة فقط، لا تؤثر على قالب الإيميل */}
           <div className="brand-wordmark" aria-label="شعار يؤثرون">
             يؤثرون
           </div>
