@@ -143,12 +143,25 @@ export default async function handler(req, res) {
       </div>
     `;
 
-    await transporter.sendMail({
-      from: process.env.MAIL_FROM,
-      to: donorEmail,
+    const from = process.env.MAIL_FROM;
+    const to = donorEmail;
+
+    // path: pages/api/donate/send-email.js - تنفيذ sendMail ثم تسجيل نتيجة SMTP مباشرة
+    const info = await transporter.sendMail({
+      from,
+      to,
       subject,
-      text,
       html,
+      text,
+    });
+
+    console.log('SMTP result', {
+      to,
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      response: info.response,
+      envelope: info.envelope,
     });
 
     return res.status(200).json({
