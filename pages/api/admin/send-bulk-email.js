@@ -91,12 +91,22 @@ export default async function handler(req, res) {
     // path: pages/api/admin/send-bulk-email.js - إرسال الرسائل واحدًا واحدًا للحصول على نتيجة دقيقة لكل مستلم
     for (const to of recipients) {
       try {
+        // path: pages/api/admin/send-bulk-email.js - تنفيذ sendMail ثم تسجيل نتيجة SMTP مباشرة
         const info = await transporter.sendMail({
           from,
           to,
           subject,
           html: html || undefined,
           text: text || undefined,
+        });
+
+        console.log('SMTP result', {
+          to,
+          messageId: info.messageId,
+          accepted: info.accepted,
+          rejected: info.rejected,
+          response: info.response,
+          envelope: info.envelope,
         });
 
         results.push({
