@@ -19,6 +19,22 @@ const getReelId = (reel, fallback = '') => {
   return reel._id || reel.id || fallback;
 };
 
+// path: pages/reels.jsx - توحيد قراءة العدادات بين الحقول القديمة والجديدة ومنع ظهور 0 بالخطأ
+const toSafeCount = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+};
+
+const resolveReelCounts = (reel = {}) => {
+  const counts = reel?.counts || {};
+  return {
+    likes: Math.max(toSafeCount(reel?.likesCount), toSafeCount(counts?.likes)),
+    comments: Math.max(toSafeCount(reel?.commentsCount), toSafeCount(counts?.comments)),
+    views: Math.max(toSafeCount(reel?.viewsCount), toSafeCount(counts?.views)),
+    shares: Math.max(toSafeCount(reel?.sharesCount), toSafeCount(counts?.shares)),
+  };
+};
+
 function capturePosterFromVideo(
   src,
   { targetW = 960, targetH = 540, captureAt = 'auto' } = {}
@@ -264,7 +280,7 @@ export default function ReelsPage() {
         src: capturedPosters[id] || mediaUrl(posters[id] || r.poster || r.thumbnail || ''),
         videoSrc: mediaUrl(r.videoUrl || ''),
         alt: r.title || 'ريل',
-        counts: r.counts || {},
+        counts: resolveReelCounts(r),
       };
     });
   }, [reels, posters, capturedPosters]);
@@ -1106,10 +1122,12 @@ function ReelCard({ reel, index, globalMuted, registerVideo, onToggleMute, fetch
   const [liking, setLiking] = useState(false);
   const [buffering, setBuffering] = useState(true);
 
-  const [likesCount, setLikesCount] = useState(reel?.counts?.likes || 0);
-  const [viewsCount, setViewsCount] = useState(reel?.counts?.views || 0);
-  const [sharesCount, setSharesCount] = useState(reel?.counts?.shares || 0);
-  const [commentsCount, setCommentsCount] = useState(reel?.counts?.comments || 0);
+  const initialCounts = useMemo(() => resolveReelCounts(reel), [reel]);
+
+  const [likesCount, setLikesCount] = useState(initialCounts.likes);
+  const [viewsCount, setViewsCount] = useState(initialCounts.views);
+  const [sharesCount, setSharesCount] = useState(initialCounts.shares);
+  const [commentsCount, setCommentsCount] = useState(initialCounts.comments);
 
   const [openComments, setOpenComments] = useState(false);
 
@@ -1134,11 +1152,12 @@ function ReelCard({ reel, index, globalMuted, registerVideo, onToggleMute, fetch
   const fmt = useCallback((n) => formatCount(n), []);
 
   useEffect(() => {
-    setLikesCount(reel?.counts?.likes || 0);
-    setViewsCount(reel?.counts?.views || 0);
-    setSharesCount(reel?.counts?.shares || 0);
-    setCommentsCount(reel?.counts?.comments || 0);
-  }, [reel?.counts]);
+    const nextCounts = resolveReelCounts(reel);
+    setLikesCount(nextCounts.likes);
+    setViewsCount(nextCounts.views);
+    setSharesCount(nextCounts.shares);
+    setCommentsCount(nextCounts.comments);
+  }, [reel]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -1432,6 +1451,7 @@ function CommentsDrawer({ reelId, open, onClose, onCountChange, fetchFp }) {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [name, setName] = useState('');
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -1439,18 +1459,36 @@ function CommentsDrawer({ reelId, open, onClose, onCountChange, fetchFp }) {
 
   const fetchPage = async (p = 1) => {
     const res = await fetchFp(`${base}/api/reels/${reelId}/comments?page=${p}&limit=20`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const data = await res.json();
+    const incomingItems = Array.isArray(data.items) ? data.items : [];
 
-    if (p === 1) setItems(data.items || []);
-    else setItems((prev) => [...prev, ...(data.items || [])]);
+    if (p === 1) {
+      setItems(incomingItems);
+    } else {
+      setItems((prev) => [...prev, ...incomingItems]);
+    }
 
-    setPage(data.page || 1);
-    setPages(data.pages || 1);
-    onCountChange?.(data.total || 0);
+    setPage(Number(data.page) || 1);
+    setPages(Number(data.pages) || 1);
+
+    const safeTotal = Number.isFinite(Number(data.total))
+      ? Number(data.total)
+      : p === 1
+        ? incomingItems.length
+        : totalCount;
+
+    setTotalCount(safeTotal);
+    onCountChange?.(safeTotal);
   };
 
   useEffect(() => {
-    if (open && reelId) fetchPage(1);
+    if (open && reelId) {
+      fetchPage(1).catch(() => {
+        flashToast('تعذّر تحميل التعليقات.');
+      });
+    }
   }, [open, reelId]);
 
   useEffect(() => {
@@ -1499,14 +1537,20 @@ function CommentsDrawer({ reelId, open, onClose, onCountChange, fetchFp }) {
         body: JSON.stringify({ name: name.trim(), text: text.trim() }),
       });
 
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
 
       if (data?.comment) {
-        setItems((prev) => {
-          const next = [data.comment, ...prev];
-          onCountChange?.(next.length);
-          return next;
-        });
+        setItems((prev) => [data.comment, ...prev]);
+
+        const nextTotal = Number.isFinite(Number(data.total))
+          ? Number(data.total)
+          : totalCount + 1;
+
+        setTotalCount(nextTotal);
+        onCountChange?.(nextTotal);
+
         setText('');
         incSentCount();
         flashToast('تم إرسال رسالتك بنجاح');
