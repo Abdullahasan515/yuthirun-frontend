@@ -191,6 +191,8 @@ export default function Home() {
   });
 
   const nf = (n) => Number(n || 0).toLocaleString("ar-EG");
+  // path: pages/index.jsx - helper لتنسيق مبالغ التبرعات في بطاقات الصفحة الرئيسية
+  const formatMoney = (n) => Number(n || 0).toLocaleString("en-US");
   const posters = useVideoPosters(reels, mediaUrl);
 
   const fetchGz = useCallback(async () => {
@@ -782,50 +784,80 @@ export default function Home() {
               className="mySwiper2"
             >
               {section.data.length > 0 ? (
-                section.data.map((item) => (
-                  <SwiperSlide key={item._id}>
-                    <Link href={`/news/${item._id}`} legacyBehavior>
-                      <a>
-                        <div className="card cardNews">
-                          <img src={mediaUrl(item.firstImage)} className="card-img-top" alt="صورة الخبر" />
-                          <div className="card-body">
-                            <h5 className="card-title">{item.title}</h5>
-                            <p className="card-text">{item.text}</p>
-                            <p className="badge bg-secondary mr-10pc">{item.relativeTime}</p>
+                section.data.map((item) => {
+                  // path: pages/index.jsx - معالجة ظهور حالة اكتمال التبرع في بطاقات الصفحة الرئيسية
+                  const targetAmount = Number(item.amount || 0);
+                  const donatedAmount = Number(item.donatedAmount || 0);
+                  const isDonationCard = item.newsType !== "achievements";
+                  const isDonationComplete = isDonationCard && targetAmount > 0 && donatedAmount >= targetAmount;
+                  const remainingAmount = isDonationCard ? Math.max(targetAmount - donatedAmount, 0) : 0;
+                  const extraAmount = isDonationCard ? Math.max(donatedAmount - targetAmount, 0) : 0;
+                  const completedAmount = isDonationCard ? (targetAmount || donatedAmount) : 0;
+                  const progressValue = isDonationCard
+                    ? Math.min(donatedAmount, targetAmount || donatedAmount || 0)
+                    : 0;
+
+                  return (
+                    <SwiperSlide key={item._id}>
+                      <Link href={`/news/${item._id}`} legacyBehavior>
+                        <a>
+                          <div className="card cardNews">
+                            <img src={mediaUrl(item.firstImage)} className="card-img-top" alt="صورة الخبر" />
+                            <div className="card-body">
+                              <h5 className="card-title">{item.title}</h5>
+                              <p className="card-text">{item.text}</p>
+                              <p className="badge bg-secondary mr-10pc">{item.relativeTime}</p>
+                            </div>
+
+                            {isDonationCard &&
+                              (isDonationComplete ? (
+                                <>
+                                  <div className="tt">
+                                    <div className="tt1">
+                                      <p className="gf">المبلغ المكتمل</p>
+                                      <p className="cx true-amount">${formatMoney(completedAmount)}</p>
+                                    </div>
+                                    <div className="tt1">
+                                      <p className="gf">المبلغ الزائد</p>
+                                      <p className="cx loss-amount">${formatMoney(extraAmount)}</p>
+                                    </div>
+                                  </div>
+
+                                  <div className="home-completed-text">تم إكمال مبلغ التبرع</div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="tt">
+                                    <div className="tt1">
+                                      <p className="gf">مدفوع</p>
+                                      <p className="cx true-amount">${formatMoney(donatedAmount)}</p>
+                                    </div>
+                                    <div className="tt1">
+                                      <p className="gf">متبقي</p>
+                                      <p className="cx loss-amount">${formatMoney(remainingAmount)}</p>
+                                    </div>
+                                  </div>
+
+                                  <div className="tt2">
+                                    <progress className="progress-shooting-star" value={progressValue} max={targetAmount || 1} />
+                                    <Link href={{ pathname: "/donate", query: { newsId: item._id } }} legacyBehavior>
+                                      <a className="donate-btn-link magic-glow">
+                                        <span className="span1"></span>
+                                        <span className="span2"></span>
+                                        <span className="span3"></span>
+                                        <span className="span4"></span>
+                                        تبرع ←
+                                      </a>
+                                    </Link>
+                                  </div>
+                                </>
+                              ))}
                           </div>
-
-                          {item.newsType !== "achievements" && (
-                            <>
-                              <div className="tt">
-                                <div className="tt1">
-                                  <p className="gf">مدفوع</p>
-                                  <p className="cx true-amount">${item.donatedAmount}</p>
-                                </div>
-                                <div className="tt1">
-                                  <p className="gf">متبقي</p>
-                                  <p className="cx loss-amount">${item.remainingAmount}</p>
-                                </div>
-                              </div>
-
-                              <div className="tt2">
-                                <progress className="progress-shooting-star" value={item.donatedAmount} max={item.amount} />
-                                <Link href={{ pathname: "/donate", query: { newsId: item._id } }} legacyBehavior>
-                                  <a className="donate-btn-link magic-glow">
-                                    <span className="span1"></span>
-                                    <span className="span2"></span>
-                                    <span className="span3"></span>
-                                    <span className="span4"></span>
-                                    تبرع ←
-                                  </a>
-                                </Link>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </a>
-                    </Link>
-                  </SwiperSlide>
-                ))
+                        </a>
+                      </Link>
+                    </SwiperSlide>
+                  );
+                })
               ) : (
                 <SwiperSlide>
                   <div className="text-center p-3">
@@ -1588,6 +1620,27 @@ export default function Home() {
 
         .badge.bg-primary{ background-color: var(--primary) !important; }
         .badge.bg-secondary{ background-color: var(--primary-light) !important; }
+
+        /* path: pages/index.jsx - تنسيق حالة اكتمال التبرع في الصفحة الرئيسية */
+        .home-completed-text{
+          margin: 0 16px 16px;
+          padding: 14px 16px;
+          text-align: center;
+          border-radius: 12px;
+          background: rgba(24,165,88,.12);
+          border: 1px solid rgba(24,165,88,.22);
+          color: var(--primary-dark);
+          font-size: 20px;
+          font-weight: 800;
+          line-height: 1.6;
+        }
+
+        @media (max-width: 768px){
+          .home-completed-text{
+            margin: 0 12px 12px;
+            font-size: 18px;
+          }
+        }
 
         @media (min-width: 640px){
           .gz-grid{ grid-template-columns: 1.3fr .7fr; align-items:stretch }
