@@ -43,13 +43,13 @@ export default function Success() {
         setDonation(successData);
         setLoading(false);
 
-        // path: client/pages/src/success.jsx - إرسال رسالة الشكر بعد نجاح الدفع مباشرة
+        // path: client/pages/src/success.jsx - إرسال رسالة الشكر عبر Vercel API المحلي بدل Railway
         if (!emailTriggeredRef.current) {
           emailTriggeredRef.current = true;
           setEmailStatus('sending');
 
           try {
-            const emailRes = await fetch(`${API_BASE}/donate/send-email`, {
+            const emailRes = await fetch('/api/donate/send-email', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export default function Success() {
 
       <div className="success-page">
         <div className="success-card">
-          {/* path: client/pages/src/success.jsx - تم استبدال صورة الشعار بشعار يؤثرون النصي */}
+          {/* path: client/pages/src/success.jsx - شعار نصي مطابق للهيدر */}
           <div className="brand-wordmark" aria-label="شعار يؤثرون">
             يؤثرون
           </div>
