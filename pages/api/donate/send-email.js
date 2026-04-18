@@ -5,6 +5,19 @@ function normalizeBaseUrl(value = '') {
   return String(value || '').replace(/\/$/, '');
 }
 
+function normalizeString(value = '') {
+  return String(value || '').trim();
+}
+
+function escapeHtml(value = '') {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function createTransporter() {
   return nodemailer.createTransport({
     host: process.env.MAIL_HOST,
@@ -23,38 +36,7 @@ function createTransporter() {
   });
 }
 
-// path: pages/api/donate/send-email.js - شعار نصي مطابق للهيدر
-function renderEmailWordmark() {
-  return `
-    <div style="text-align:center; margin-bottom:20px;">
-      <span
-        style="
-          display:inline-block;
-          font-family:'LateefCustom','Ping AR LT','Noto Naskh Arabic','Amiri',serif;
-          font-size:52px;
-          line-height:1;
-          color:#18A558;
-          text-decoration:none;
-          text-shadow:0 10px 24px rgba(0,0,0,.08);
-          white-space:nowrap;
-          font-weight:700;
-        "
-      >
-        يؤثرون
-      </span>
-    </div>
-  `;
-}
-
-function escapeHtml(value = '') {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
+// path: pages/api/donate/send-email.js - جلب بيانات التبرع من الباك
 async function getDonationSuccessData(sessionId) {
   const backendBase =
     normalizeBaseUrl(process.env.BACKEND_API_BASE_URL) ||
@@ -73,6 +55,65 @@ async function getDonationSuccessData(sessionId) {
   }
 
   return res.json();
+}
+
+// path: pages/api/donate/send-email.js - قالب HTML نظيف وبسيط مثل قالب الإدارة الذي نجح
+function buildHtmlContent({ donorName, amount, country, frontendUrl }) {
+  const cleanFrontendUrl = normalizeBaseUrl(frontendUrl || 'https://yuthirun.com');
+  const logoUrl = `${cleanFrontendUrl}/Afaq1.png`;
+
+  return `
+    <div dir="rtl" style="background:#f5f5f5; padding:20px; font-family:'Segoe UI', Tahoma, sans-serif;">
+      <div style="max-width:600px; margin:auto; background:white; border-radius:8px; padding:30px; box-shadow:0 0 10px rgba(0,0,0,0.05);">
+        <div style="text-align:center; margin-bottom:20px;">
+          <img src="${logoUrl}" alt="يؤثرون" style="max-width:150px; border-radius:8px;" />
+        </div>
+
+        <div style="font-size:16px; line-height:1.8; color:#333;">
+          <p>السلام عليكم ورحمة الله وبركاته ${escapeHtml(donorName)}،</p>
+
+          <p>
+            جزاك الله خيرًا على تبرعك بقيمة
+            <strong>${amount.toLocaleString('en-US')} دولارًا أمريكيًا</strong>
+            من <strong>${escapeHtml(country)}</strong>.
+          </p>
+
+          <p>
+            نشكرك على دعمك الكريم، ونسأل الله أن يجعل هذا التبرع في ميزان حسناتك.
+          </p>
+        </div>
+
+        <div style="text-align:center; margin-top:30px;">
+          <a
+            href="${cleanFrontendUrl}"
+            style="background-color:#00a896; color:white; padding:12px 20px; text-decoration:none; border-radius:5px; font-size:15px; display:inline-block;"
+          >
+            زيارة موقع يؤثرون
+          </a>
+        </div>
+
+        <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
+
+        <p style="font-size:13px; color:#888; text-align:center;">
+          هذه رسالة شكر تلقائية بعد نجاح عملية التبرع
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+// path: pages/api/donate/send-email.js - نسخة نصية نظيفة مرافقة
+function buildTextContent({ donorName, amount, country, frontendUrl }) {
+  const cleanFrontendUrl = normalizeBaseUrl(frontendUrl || 'https://yuthirun.com');
+
+  return [
+    `السلام عليكم ورحمة الله وبركاته ${donorName}`,
+    '',
+    `جزاك الله خيرًا على تبرعك بقيمة ${amount.toLocaleString('en-US')} دولارًا أمريكيًا من ${country}.`,
+    'نشكرك على دعمك الكريم، ونسأل الله أن يجعل هذا التبرع في ميزان حسناتك.',
+    '',
+    `زيارة الموقع: ${cleanFrontendUrl}`,
+  ].join('\n');
 }
 
 export default async function handler(req, res) {
@@ -95,10 +136,11 @@ export default async function handler(req, res) {
 
     const donation = await getDonationSuccessData(session_id);
 
-    const donorName = String(donation?.donorName || 'المتبرع الكريم').trim();
-    const donorEmail = String(donation?.email || '').trim();
-    const country = String(donation?.country || 'غير محدد').trim();
+    const donorName = normalizeString(donation?.donorName || 'المتبرع الكريم');
+    const donorEmail = normalizeString(donation?.email || '');
+    const country = normalizeString(donation?.country || 'غير محدد');
     const amount = Number(donation?.amount || 0);
+    const frontendUrl = normalizeString(process.env.FRONTEND_URL || 'https://yuthirun.com');
 
     if (!donorEmail) {
       return res.status(400).json({
@@ -110,53 +152,30 @@ export default async function handler(req, res) {
     const transporter = createTransporter();
 
     const subject = 'شكرًا لتبرعك معنا!';
-    const text = [
-      `السلام عليكم ورحمة الله وبركاته ${donorName}`,
-      '',
-      `جزاك الله خيرًا على تبرعك بقيمة ${amount.toLocaleString('en-US')} دولارًا أمريكيًا من ${country}.`,
-      'نسأل الله أن يجعله في ميزان حسناتك.',
-      '',
-      'جمعية آفاق - يؤثرون',
-    ].join('\n');
-
-    const html = `
-      <div dir="rtl" style="background:#f5f5f5; padding:20px; font-family:'Segoe UI', Tahoma, sans-serif;">
-        <div style="max-width:600px; margin:auto; background:white; border-radius:8px; padding:30px; box-shadow:0 0 10px rgba(0,0,0,0.05);">
-          ${renderEmailWordmark()}
-
-          <div style="font-size:16px; line-height:1.9; color:#333;">
-            <p>السلام عليكم ورحمة الله وبركاته ${escapeHtml(donorName)}،</p>
-            <p>
-              جزاك الله خيرًا على تبرعك بقيمة
-              <strong>${amount.toLocaleString('en-US')} دولارًا أمريكيًا</strong>
-              من <strong>${escapeHtml(country)}</strong>.
-            </p>
-            <p>نسأل الله أن يجعله في ميزان حسناتك.</p>
-            <p>بارك الله فيك وجزاك خيرًا،<br /> - منصة يؤثرون </p>
-          </div>
-
-          <hr style="margin:30px 0; border:none; border-top:1px solid #eee;">
-          <p style="font-size:13px; color:#888; text-align:center;">
-            هذه رسالة شكر تلقائية بعد نجاح عملية التبرع
-          </p>
-        </div>
-      </div>
-    `;
-
-    const from = process.env.MAIL_FROM;
-    const to = donorEmail;
-
-    // path: pages/api/donate/send-email.js - تنفيذ sendMail ثم تسجيل نتيجة SMTP مباشرة
-    const info = await transporter.sendMail({
-      from,
-      to,
-      subject,
-      html,
-      text,
+    const html = buildHtmlContent({
+      donorName,
+      amount,
+      country,
+      frontendUrl,
     });
 
-    console.log('SMTP result', {
-      to,
+    const text = buildTextContent({
+      donorName,
+      amount,
+      country,
+      frontendUrl,
+    });
+
+    const info = await transporter.sendMail({
+      from: process.env.MAIL_FROM,
+      to: donorEmail,
+      subject,
+      text,
+      html,
+    });
+
+    console.log('Donation thank-you SMTP result', {
+      to: donorEmail,
       messageId: info.messageId,
       accepted: info.accepted,
       rejected: info.rejected,
