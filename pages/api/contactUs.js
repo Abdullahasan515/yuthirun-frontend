@@ -1,5 +1,6 @@
 // path: pages/api/contactUs.js
 import nodemailer from 'nodemailer';
+import { verifyGoogleEmailMatch } from '../../lib/server/googleVerify';
 
 const normalizeBaseUrl = (value = '') => String(value || '').replace(/\/$/, '');
 
@@ -84,7 +85,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, message, privacyCheck } = req.body || {};
+    // path: pages/api/contactUs.js - استقبال googleCredential مع بيانات النموذج
+    const { name, email, message, privacyCheck, googleCredential } = req.body || {};
 
     if (!privacyCheck) {
       return res.status(400).json({
@@ -100,16 +102,36 @@ export default async function handler(req, res) {
       });
     }
 
+    const safeName = String(name).trim();
+    const safeEmail = String(email).trim();
+    const safeMessage = String(message).trim();
+
+    if (!safeName || !safeEmail || !safeMessage) {
+      return res.status(400).json({
+        success: false,
+        error: 'يرجى تعبئة جميع الحقول المطلوبة',
+      });
+    }
+
+    // path: pages/api/contactUs.js - التحقق النهائي من Google قبل الإرسال
+    const verified = await verifyGoogleEmailMatch({
+      credential: googleCredential,
+      email: safeEmail,
+    });
+
+    if (!verified?.ok) {
+      return res.status(401).json({
+        success: false,
+        error: verified?.error || 'فشل التحقق من المستخدم',
+      });
+    }
+
     const transporter = createTransporter();
 
     const receiverEmail =
       process.env.CONTACT_RECEIVER_EMAIL ||
       process.env.MAIL_USER ||
       'support@yuthirun.com';
-
-    const safeName = String(name).trim();
-    const safeEmail = String(email).trim();
-    const safeMessage = String(message).trim();
 
     const subject = `رسالة جديدة من ${safeName}`;
     const text = `الاسم: ${safeName}\nالبريد: ${safeEmail}\n\n${safeMessage}`;
@@ -148,6 +170,8 @@ export default async function handler(req, res) {
         email: safeEmail,
         message: safeMessage,
         privacyCheck: true,
+        verifiedGoogle: true,
+        googleSub: verified.sub || '',
       });
     } catch (storeError) {
       console.error('Contact message stored email-sent but DB-save failed:', storeError);
