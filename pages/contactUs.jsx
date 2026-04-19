@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { toast, ToastContainer } from 'react-toastify';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation, Autoplay } from 'swiper/modules';
+import { requestGoogleCredential } from '../lib/googleEmailClient';
 import 'react-toastify/dist/ReactToastify.css';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -107,7 +108,7 @@ export default function ContactUs() {
     }));
   };
 
-  // path: pages/contactUs.jsx - الإرسال الحقيقي عبر Vercel
+  // path: pages/contactUs.jsx - الإرسال الحقيقي عبر Vercel مع تحقق Google المؤقت
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -138,11 +139,17 @@ export default function ContactUs() {
     try {
       setSubmitting(true);
 
+      // path: pages/contactUs.jsx - طلب تحقق Google قبل إرسال النموذج
+      const googleCredential = await requestGoogleCredential();
+
       const res = await withTimeout(
         fetch(CONTACT_FORM_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            ...payload,
+            googleCredential,
+          }),
         }),
         20000
       );
@@ -283,7 +290,7 @@ export default function ContactUs() {
                   disabled={submitting}
                   aria-busy={submitting ? 'true' : 'false'}
                 >
-                  {submitting ? 'جاري الإرسال...' : 'إرسال'}
+                  {submitting ? 'جاري التحقق والإرسال...' : 'إرسال'}
                 </button>
               </form>
             </div>
