@@ -1,8 +1,9 @@
 // path: Components/Footer.jsx
 import { useEffect, useState, useMemo } from 'react';
+import { requestGoogleCredential } from '../lib/googleEmailClient';
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
-const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : '/subscribe';
+// path: Components/Footer.jsx - الاشتراك صار يمر عبر Vercel API route المحلي
+const SUBSCRIBE_ENDPOINT = '/api/subscribe';
 
 export default function Footer({ footer = {} }) {
   const [subLoading, setSubLoading] = useState(false);
@@ -37,6 +38,7 @@ export default function Footer({ footer = {} }) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // path: Components/Footer.jsx - الاشتراك مع تحقق Google المؤقت
   const onSubmitSubscribe = async (e) => {
     e.preventDefault();
     setSubErr('');
@@ -47,15 +49,25 @@ export default function Footer({ footer = {} }) {
     setSubLoading(true);
 
     try {
-      // path: Components/Footer.jsx - تم تعديل الإرسال ليذهب مباشرة إلى الباك الصحيح
+      const googleCredential = await requestGoogleCredential();
+
       const response = await fetch(SUBSCRIBE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, googleCredential }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Subscribe request failed with status ${response.status}`);
+      let data = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok || !data?.success) {
+        throw new Error(
+          data?.error || `Subscribe request failed with status ${response.status}`
+        );
       }
 
       setSubOk(true);
@@ -66,7 +78,7 @@ export default function Footer({ footer = {} }) {
       e.currentTarget.reset();
     } catch (err) {
       console.error('Subscription error:', err);
-      setSubErr('حدث خطأ أثناء الإرسال. حاول مجددًا.');
+      setSubErr(err?.message || 'حدث خطأ أثناء الإرسال. حاول مجددًا.');
     } finally {
       setSubLoading(false);
     }
@@ -125,7 +137,7 @@ export default function Footer({ footer = {} }) {
                     />
                     <button type="submit" disabled={subLoading}>
                       {subLoading && <span className="spinner" aria-hidden />}
-                      <span>{subLoading ? '...جاري الإرسال' : 'إرسال'}</span>
+                      <span>{subLoading ? 'جاري التحقق والإرسال...' : 'إرسال'}</span>
                     </button>
                     {subErr && <div className="sub-error">{subErr}</div>}
                   </form>
