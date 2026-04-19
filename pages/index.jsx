@@ -6,12 +6,15 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation, Autoplay } from "swiper/modules";
+import { requestGoogleCredential } from "../lib/googleEmailClient";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
-const SUBSCRIBE_ENDPOINT = API_BASE ? `${API_BASE}/subscribe` : "/subscribe";
+
+// path: pages/index.jsx - الاشتراك صار يمر عبر Vercel API route المحلي
+const SUBSCRIBE_ENDPOINT = "/api/subscribe";
 
 const mediaUrl = (u) => {
   if (!u) return u;
@@ -353,6 +356,7 @@ export default function Home() {
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
+
                 const email = e.currentTarget.email.value.trim();
                 const btn = e.currentTarget.querySelector('button[type="submit"]');
                 const old = btn.textContent;
@@ -360,18 +364,29 @@ export default function Home() {
                 if (!email) return;
 
                 btn.disabled = true;
-                btn.textContent = "...جاري الإرسال";
+                btn.textContent = "جاري التحقق والإرسال...";
 
                 try {
-                  // path: pages/index.jsx - تم تعديل الإرسال ليذهب مباشرة إلى الباك الصحيح
+                  // path: pages/index.jsx - طلب تحقق Google قبل إرسال الاشتراك من النافذة المنبثقة
+                  const googleCredential = await requestGoogleCredential();
+
                   const response = await fetch(SUBSCRIBE_ENDPOINT, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email }),
+                    body: JSON.stringify({ email, googleCredential }),
                   });
 
-                  if (!response.ok) {
-                    throw new Error(`Subscribe request failed with status ${response.status}`);
+                  let data = null;
+                  try {
+                    data = await response.json();
+                  } catch {
+                    data = null;
+                  }
+
+                  if (!response.ok || !data?.success) {
+                    throw new Error(
+                      data?.error || `Subscribe request failed with status ${response.status}`
+                    );
                   }
 
                   try {
@@ -381,7 +396,7 @@ export default function Home() {
                   setShowModal(false);
                 } catch (err) {
                   console.error("Subscription error:", err);
-                  alert("حدث خطأ أثناء إرسال البريد. حاول مرة أخرى.");
+                  alert(err?.message || "حدث خطأ أثناء إرسال البريد. حاول مرة أخرى.");
                 } finally {
                   btn.disabled = false;
                   btn.textContent = old;
