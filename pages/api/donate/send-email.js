@@ -9,15 +9,6 @@ function normalizeString(value = '') {
   return String(value || '').trim();
 }
 
-function escapeHtml(value = '') {
-  return String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function formatAmount(amount) {
   const numericAmount = Number(amount);
 
@@ -34,23 +25,6 @@ function getRequestProtocol(req) {
     .trim();
 
   return forwardedProto || 'https';
-}
-
-function getFrontendBaseUrl(req) {
-  const configuredFrontendUrl =
-    normalizeBaseUrl(process.env.FRONTEND_URL) ||
-    normalizeBaseUrl(process.env.NEXT_PUBLIC_SITE_URL);
-
-  if (configuredFrontendUrl) {
-    return configuredFrontendUrl;
-  }
-
-  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').trim();
-  if (!host) {
-    return 'https://yuthirun.com';
-  }
-
-  return `${getRequestProtocol(req)}://${host.replace(/^api\./, '')}`;
 }
 
 function getBackendBaseUrl(req) {
@@ -76,6 +50,23 @@ function getBackendBaseUrl(req) {
 
   const apiHost = hostname.startsWith('api.') ? hostname : `api.${hostname}`;
   return `${protocol}://${apiHost}`;
+}
+
+function getFrontendBaseUrl(req) {
+  const configuredFrontendUrl =
+    normalizeBaseUrl(process.env.FRONTEND_URL) ||
+    normalizeBaseUrl(process.env.NEXT_PUBLIC_SITE_URL);
+
+  if (configuredFrontendUrl) {
+    return configuredFrontendUrl;
+  }
+
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').trim();
+  if (!host) {
+    return 'https://yuthirun.com';
+  }
+
+  return `${getRequestProtocol(req)}://${host.replace(/^api\./, '')}`;
 }
 
 function createTransporter() {
@@ -125,63 +116,20 @@ async function getDonationSuccessData(req, sessionId) {
   return payload;
 }
 
-// path: pages/api/donate/send-email.js - قالب HTML نظيف لرسالة شكر التبرع
-function buildHtmlContent({ donorName, amount, country, projectTitle, frontendUrl }) {
-  const cleanFrontendUrl = normalizeBaseUrl(frontendUrl || 'https://yuthirun.com');
-  const logoUrl = `${cleanFrontendUrl}/Afaq1.png`;
-
-  return `
-    <div dir="rtl" style="background:#f5f7f6; padding:24px; font-family:'Segoe UI',Tahoma,sans-serif; color:#1f2937;">
-      <div style="max-width:640px; margin:auto; background:#ffffff; border-radius:16px; padding:32px; box-shadow:0 8px 28px rgba(0,0,0,.06); border:1px solid rgba(24,165,88,.10);">
-        <div style="text-align:center; margin-bottom:24px;">
-          <img src="${logoUrl}" alt="يؤثرون" style="max-width:150px; height:auto;" />
-        </div>
-
-        <h2 style="margin:0 0 16px; color:#128347; text-align:center;">شكراً لتبرعك معنا</h2>
-
-        <div style="font-size:16px; line-height:1.95; color:#334155;">
-          <p style="margin:0 0 12px;">السلام عليكم ورحمة الله وبركاته ${escapeHtml(donorName)}،</p>
-          <p style="margin:0 0 12px;">
-            تم استلام تبرعك بنجاح بقيمة <strong>${formatAmount(amount)} دولارًا أمريكيًا</strong>
-            من <strong>${escapeHtml(country)}</strong>.
-          </p>
-          <p style="margin:0 0 12px;">
-            المشروع المرتبط بالتبرع: <strong>${escapeHtml(projectTitle || 'غير محدد')}</strong>.
-          </p>
-          <p style="margin:0;">
-            نشكرك على دعمك الكريم، ونسأل الله أن يجعل هذا العطاء في ميزان حسناتك.
-          </p>
-        </div>
-
-        <div style="text-align:center; margin-top:28px;">
-          <a
-            href="${cleanFrontendUrl}"
-            style="background:#18a558; color:#ffffff; padding:12px 22px; text-decoration:none; border-radius:10px; font-size:15px; font-weight:700; display:inline-block;"
-          >
-            زيارة موقع يؤثرون
-          </a>
-        </div>
-
-        <hr style="margin:28px 0; border:none; border-top:1px solid #e5e7eb;" />
-
-        <p style="font-size:13px; color:#64748b; text-align:center; margin:0;">
-          هذه رسالة شكر تلقائية بعد نجاح عملية التبرع.
-        </p>
-      </div>
-    </div>
-  `;
-}
-
-// path: pages/api/donate/send-email.js - نسخة نصية مرافقة لرسالة الشكر
-function buildTextContent({ donorName, amount, country, projectTitle, frontendUrl }) {
+// path: pages/api/donate/send-email.js - رسالة نصية فقط بدون HTML
+function buildPlainTextMessage({ donorName, amount, country, state, projectTitle, frontendUrl }) {
   const cleanFrontendUrl = normalizeBaseUrl(frontendUrl || 'https://yuthirun.com');
 
   return [
     `السلام عليكم ورحمة الله وبركاته ${donorName}`,
     '',
-    `تم استلام تبرعك بنجاح بقيمة ${formatAmount(amount)} دولارًا أمريكيًا من ${country}.`,
-    `المشروع المرتبط بالتبرع: ${projectTitle || 'غير محدد'}.`,
-    'نشكرك على دعمك الكريم، ونسأل الله أن يجعل هذا التبرع في ميزان حسناتك.',
+    'تم استلام تبرعك بنجاح.',
+    `المبلغ: ${formatAmount(amount)} دولار أمريكي`,
+    `الدولة: ${country || 'غير محدد'}`,
+    `المنطقة: ${state || 'غير محدد'}`,
+    `المشروع: ${projectTitle || 'غير محدد'}`,
+    '',
+    'نشكر لك دعمك الكريم، ونسأل الله أن يجعل هذا التبرع في ميزان حسناتك.',
     '',
     `زيارة الموقع: ${cleanFrontendUrl}`,
   ].join('\n');
@@ -210,6 +158,7 @@ export default async function handler(req, res) {
     const donorName = normalizeString(donation?.donorName || 'المتبرع الكريم');
     const donorEmail = normalizeString(donation?.email || '');
     const country = normalizeString(donation?.country || 'غير محدد');
+    const state = normalizeString(donation?.state || 'غير محدد');
     const projectTitle = normalizeString(donation?.projectTitle || 'غير محدد');
     const amount = Number(donation?.amount || 0);
     const frontendUrl = getFrontendBaseUrl(req);
@@ -228,17 +177,11 @@ export default async function handler(req, res) {
       from: process.env.MAIL_FROM || process.env.MAIL_USER,
       to: donorEmail,
       subject,
-      text: buildTextContent({
+      text: buildPlainTextMessage({
         donorName,
         amount,
         country,
-        projectTitle,
-        frontendUrl,
-      }),
-      html: buildHtmlContent({
-        donorName,
-        amount,
-        country,
+        state,
         projectTitle,
         frontendUrl,
       }),
