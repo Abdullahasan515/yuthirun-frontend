@@ -19,6 +19,17 @@ function formatUsd(amount) {
   return `${numericAmount.toLocaleString('en-US')} $`;
 }
 
+function formatMethod(method) {
+  const clean = String(method || '').trim().toLowerCase();
+
+  if (clean === 'stripe') return 'Stripe';
+  if (clean === 'paypal') return 'PayPal';
+  if (clean === 'visa') return 'Visa';
+  if (clean === 'mastercard') return 'MasterCard';
+
+  return normalizeText(method);
+}
+
 export default function Success() {
   const router = useRouter();
   const sessionId = typeof router.query.session_id === 'string' ? router.query.session_id : '';
@@ -53,7 +64,7 @@ export default function Success() {
         setLoading(true);
         setErrorMessage('');
 
-        // path: pages/success.jsx - الاعتماد على API محلي في Next بدل استدعاء الباك مباشرة من المتصفح
+        // path: pages/success.jsx - جلب بيانات النجاح من API المحلي في Next
         const successRes = await fetch(
           `/api/donate/success?session_id=${encodeURIComponent(sessionId)}`,
           {
@@ -74,14 +85,12 @@ export default function Success() {
           );
         }
 
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
         setDonation(successData);
         setLoading(false);
 
-        // path: pages/success.jsx - إرسال الشكر بالبريد مرة واحدة فقط بعد نجاح جلب البيانات
+        // path: pages/success.jsx - إرسال رسالة الشكر بعد نجاح جلب بيانات التبرع
         if (!emailTriggeredRef.current) {
           emailTriggeredRef.current = true;
           setEmailStatus('sending');
@@ -140,28 +149,32 @@ export default function Success() {
   const donorCountry = normalizeText(donation?.country);
   const donorState = normalizeText(donation?.state);
   const projectTitle = normalizeText(donation?.projectTitle);
-  const paymentMethod = normalizeText(donation?.method);
+  const paymentMethod = formatMethod(donation?.method);
 
   return (
     <>
       <Head>
         <title>شكراً لتبرعك</title>
         <meta name="robots" content="noindex,nofollow" />
+        <link rel="stylesheet" href="/css/donation-success.css" />
       </Head>
 
       <div className="success-page">
         <div className="success-card">
-          <div className="success-icon" aria-hidden="true">
-            ✓
-          </div>
-
           {loading ? (
-            <div className="state-box">
+            <div className="state-box loading">
+              <div className="state-icon loading" aria-hidden="true">
+                ...
+              </div>
               <h1>جاري التحقق من بيانات التبرع...</h1>
               <p>يرجى الانتظار قليلاً حتى يتم تجهيز بيانات العملية.</p>
             </div>
           ) : errorMessage ? (
             <div className="state-box error">
+              <div className="state-icon error" aria-hidden="true">
+                ✕
+              </div>
+
               <h1>تعذر تحميل بيانات التبرع</h1>
               <p>{errorMessage}</p>
 
@@ -181,10 +194,14 @@ export default function Success() {
             </div>
           ) : (
             <div className="state-box success">
+              <div className="state-icon success" aria-hidden="true">
+                ✓
+              </div>
+
               <h1>تمت عملية التبرع بنجاح</h1>
               <p>
-                شكراً لك، تم تأكيد العملية بنجاح ونعرض لك تفاصيل المتبرع كما تم
-                حفظها في النظام.
+                شكراً لك، تم تأكيد العملية بنجاح، وهذه هي البيانات المحفوظة
+                للمتبرع.
               </p>
 
               <div className="details">
@@ -252,196 +269,6 @@ export default function Success() {
           )}
         </div>
       </div>
-
-      <style jsx global>{`
-        /* path: pages/success.jsx - إخفاء الهيدر والفوتر في صفحة النجاح */
-        html,
-        body {
-          margin: 0;
-          background: transparent;
-        }
-
-        body {
-          font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Arabic',
-            'Noto Naskh Arabic', Arial, sans-serif;
-        }
-
-        header,
-        .navbar,
-        .site-header,
-        footer,
-        .site-footer {
-          display: none !important;
-        }
-      `}</style>
-
-      <style jsx>{`
-        .success-page {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 24px;
-          background:
-            radial-gradient(1200px 320px at 100% 0%, rgba(24, 165, 88, 0.12), transparent 60%),
-            linear-gradient(180deg, #f7fff9, #eef9f2);
-        }
-
-        .success-card {
-          width: 100%;
-          max-width: 860px;
-          background: #ffffff;
-          border: 1px solid rgba(24, 165, 88, 0.14);
-          border-radius: 26px;
-          box-shadow: 0 20px 48px rgba(24, 165, 88, 0.12);
-          padding: 32px;
-          text-align: center;
-          direction: rtl;
-        }
-
-        .success-icon {
-          width: 82px;
-          height: 82px;
-          border-radius: 999px;
-          margin: 0 auto 18px;
-          display: grid;
-          place-items: center;
-          font-size: 40px;
-          font-weight: 900;
-          color: #ffffff;
-          background: linear-gradient(135deg, #18a558, #35c46f);
-          box-shadow: 0 16px 30px rgba(24, 165, 88, 0.22);
-        }
-
-        .state-box h1 {
-          margin: 0 0 12px;
-          color: #128347;
-          font-size: clamp(1.45rem, 3.4vw, 2rem);
-        }
-
-        .state-box p {
-          margin: 0 0 18px;
-          color: #476052;
-          line-height: 1.9;
-        }
-
-        .details {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 14px;
-          margin: 24px 0;
-          text-align: right;
-        }
-
-        .detail-item {
-          background: #f6fbf7;
-          border: 1px solid rgba(24, 165, 88, 0.12);
-          border-radius: 16px;
-          padding: 16px;
-        }
-
-        .detail-item span {
-          display: block;
-          margin-bottom: 8px;
-          color: #557463;
-          font-size: 0.95rem;
-        }
-
-        .detail-item strong {
-          display: block;
-          color: #163524;
-          word-break: break-word;
-          line-height: 1.7;
-        }
-
-        .mail-status {
-          margin-top: 8px;
-          border-radius: 14px;
-          padding: 14px 16px;
-          font-weight: 700;
-          line-height: 1.8;
-        }
-
-        .mail-status.idle,
-        .mail-status.sending {
-          background: rgba(24, 165, 88, 0.08);
-          color: #128347;
-        }
-
-        .mail-status.sent {
-          background: rgba(24, 165, 88, 0.12);
-          color: #128347;
-        }
-
-        .mail-status.failed {
-          background: rgba(220, 38, 38, 0.08);
-          color: #b91c1c;
-        }
-
-        .actions {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          flex-wrap: wrap;
-          margin-top: 24px;
-        }
-
-        .btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-width: 180px;
-          padding: 12px 18px;
-          border-radius: 12px;
-          text-decoration: none;
-          font-weight: 800;
-          transition: 0.2s ease;
-          border: none;
-          cursor: pointer;
-        }
-
-        .btn.primary {
-          background: #18a558;
-          color: #ffffff;
-        }
-
-        .btn.primary:hover {
-          background: #128347;
-        }
-
-        .btn.ghost {
-          background: rgba(24, 165, 88, 0.08);
-          color: #128347;
-          border: 1px solid rgba(24, 165, 88, 0.16);
-        }
-
-        .btn.ghost:hover {
-          background: rgba(24, 165, 88, 0.12);
-        }
-
-        .error h1 {
-          color: #b91c1c;
-        }
-
-        @media (max-width: 640px) {
-          .success-page {
-            padding: 16px;
-          }
-
-          .success-card {
-            padding: 22px;
-          }
-
-          .details {
-            grid-template-columns: 1fr;
-          }
-
-          .btn {
-            width: 100%;
-            min-width: 0;
-          }
-        }
-      `}</style>
     </>
   );
 }
