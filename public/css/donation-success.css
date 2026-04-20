@@ -1,10 +1,10 @@
-/* server/public/css/donation-success.css */
+/* path: public/css/donation-success.css */
 
 @font-face {
     font-family: 'AlmaraiLocal';
-    src: url('font/Almarai-Light.woff2') format('woff2'),
-         url('font/Almarai-Light.woff') format('woff'),
-         url('font/Almarai-Light.ttf') format('truetype');
+    src: url('../font/Almarai-Light.woff2') format('woff2'),
+         url('../font/Almarai-Light.woff') format('woff'),
+         url('../font/Almarai-Light.ttf') format('truetype');
     font-weight: 300;
     font-style: normal;
     font-display: swap;
@@ -12,9 +12,9 @@
 
 @font-face {
     font-family: 'AlmaraiLocal';
-    src: url('font/Almarai-Regular.woff2') format('woff2'),
-         url('font/Almarai-Regular.woff') format('woff'),
-         url('font/Almarai-Regular.ttf') format('truetype');
+    src: url('../font/Almarai-Regular.woff2') format('woff2'),
+         url('../font/Almarai-Regular.woff') format('woff'),
+         url('../font/Almarai-Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -22,9 +22,9 @@
 
 @font-face {
     font-family: 'AlmaraiLocal';
-    src: url('font/Almarai-Bold.woff2') format('woff2'),
-         url('font/Almarai-Bold.woff') format('woff'),
-         url('font/Almarai-Bold.ttf') format('truetype');
+    src: url('../font/Almarai-Bold.woff2') format('woff2'),
+         url('../font/Almarai-Bold.woff') format('woff'),
+         url('../font/Almarai-Bold.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -32,67 +32,146 @@
 
 :root {
     --color-bg: #F3FAF5;
+    --color-bg-soft: #EEF9F2;
     --color-text: #256F46;
+    --color-text-muted: #557463;
+    --color-title: #128347;
     --color-accent: #2E8B57;
     --color-accent-hover: #256F46;
     --color-container-bg: #ffffff;
-    --shadow-color: rgba(46, 139, 87, 0.3);
+    --color-border: rgba(46, 139, 87, 0.14);
+    --shadow-color: rgba(46, 139, 87, 0.16);
+    --danger: #b91c1c;
+    --danger-bg: rgba(220, 38, 38, 0.08);
+    --success-bg: rgba(46, 139, 87, 0.10);
+    --success-bg-strong: rgba(46, 139, 87, 0.14);
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
 }
 
 body {
-    background-color: var(--color-bg);
+    min-height: 100vh;
+    background:
+        radial-gradient(1200px 320px at 100% 0%, rgba(46, 139, 87, 0.12), transparent 60%),
+        linear-gradient(180deg, var(--color-bg), var(--color-bg-soft));
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    margin: 0;
+    padding: 24px;
+    box-sizing: border-box;
     font-family: 'AlmaraiLocal', sans-serif;
     color: var(--color-text);
     direction: rtl;
+    overflow-x: hidden;
 }
 
-.thank-container {
+html[dir="rtl"] body {
+    direction: rtl;
+}
+
+html[dir="ltr"] body {
+    direction: ltr;
+}
+
+#__next {
+    width: 100%;
+}
+
+header,
+footer,
+.navbar,
+.site-header,
+.site-footer,
+.main-header,
+.main-footer {
+    display: none !important;
+}
+
+.success-page {
+    width: 100%;
+    min-height: calc(100vh - 48px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thank-container,
+.success-card {
     background: var(--color-container-bg);
-    padding: 40px 35px 35px;
-    border-radius: 14px;
-    box-shadow: 0 12px 20px var(--shadow-color);
-    max-width: 480px;
+    padding: 34px 30px 30px;
+    border-radius: 22px;
+    box-shadow: 0 20px 48px var(--shadow-color);
+    border: 1px solid var(--color-border);
+    max-width: 860px;
     width: 100%;
     text-align: center;
     position: relative;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.thank-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 18px 28px var(--shadow-color);
+.thank-container:hover,
+.success-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 56px rgba(46, 139, 87, 0.22);
 }
 
-.logo {
-    width: 140px;
-    margin: 0 auto 28px;
-    display: block;
-    filter: drop-shadow(0 3px 6px rgba(46, 139, 87, 0.45));
-    cursor: default;
-    transition: filter 0.3s ease;
+/* إخفاء أي لوقو أعلى البيانات حتى لا يظهر الشعار فوق المحتوى */
+.logo,
+.brand-wordmark,
+.success-card .logo,
+.thank-container .logo {
+    display: none !important;
+}
+
+.success-icon {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    display: grid;
+    place-items: center;
+    font-size: 38px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #2E8B57, #35C46F);
+    box-shadow: 0 16px 30px rgba(46, 139, 87, 0.25);
 }
 
 .quranic-verse {
     font-family: 'AlmaraiLocal', sans-serif;
-    font-size: 1.7rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: #256F46;
-    margin-bottom: 25px;
-    line-height: 1.5;
-    letter-spacing: 0.04em;
+    color: var(--color-title);
+    margin: 0 0 22px;
+    line-height: 1.8;
     direction: rtl;
 }
 
-p {
-    font-size: 1.2rem;
-    margin-bottom: 36px;
-    line-height: 1.6;
-    font-weight: 500;
+.state-box h1,
+.success-title,
+.thank-container h1,
+.success-card h1 {
+    margin: 0 0 12px;
+    color: var(--color-title);
+    font-size: clamp(1.45rem, 3.4vw, 2rem);
+    line-height: 1.5;
+    font-weight: 700;
+}
+
+.state-box p,
+.success-subtitle,
+.thank-container p,
+.success-card p {
+    font-size: 1.05rem;
+    margin: 0 0 18px;
+    line-height: 1.9;
+    font-weight: 400;
+    color: var(--color-text);
 }
 
 .highlight {
@@ -100,24 +179,193 @@ p {
     font-weight: 700;
 }
 
-.btn-home {
-    background-color: #2E8B57;
-    color: #fff;
-    padding: 14px 32px;
-    border-radius: 8px;
+.details,
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+    text-align: right;
+}
+
+.detail-item,
+.detail-card {
+    background: #f6fbf7;
+    border: 1px solid rgba(46, 139, 87, 0.12);
+    border-radius: 16px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.detail-item span,
+.detail-label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.detail-item strong,
+.detail-value {
+    display: block;
+    color: #163524;
+    line-height: 1.9;
+    font-weight: 700;
+    word-break: break-word;
+    font-size: 1rem;
+}
+
+.mail-status {
+    margin-top: 6px;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-weight: 700;
+    line-height: 1.9;
+    font-size: 0.98rem;
+}
+
+.mail-status.idle,
+.mail-status.sending {
+    background: var(--success-bg);
+    color: var(--color-title);
+}
+
+.mail-status.sent {
+    background: var(--success-bg-strong);
+    color: var(--color-title);
+}
+
+.mail-status.failed {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.btn-home,
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+    padding: 14px 24px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 1.1rem;
-    box-shadow: 0 6px 18px rgba(46, 139, 87, 0.4);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    display: inline-block;
+    font-size: 1rem;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+    box-sizing: border-box;
+    border: none;
+    cursor: pointer;
 }
 
-.btn-home:hover {
-    background-color: var(--color-accent-hover);
-    box-shadow: 0 8px 20px rgba(37, 111, 70, 0.6);
+.btn-home,
+.btn.primary {
+    background-color: var(--color-accent);
     color: #fff;
+    box-shadow: 0 8px 22px rgba(46, 139, 87, 0.25);
 }
 
-html[dir="rtl"] body { direction: rtl; text-align: right; }
-html[dir="ltr"] body { direction: ltr; text-align: left; }
+.btn-home:hover,
+.btn.primary:hover {
+    background-color: var(--color-accent-hover);
+    box-shadow: 0 12px 26px rgba(37, 111, 70, 0.32);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.btn.ghost,
+.btn-secondary {
+    background: rgba(46, 139, 87, 0.08);
+    color: var(--color-title);
+    border: 1px solid rgba(46, 139, 87, 0.16);
+    box-shadow: none;
+}
+
+.btn.ghost:hover,
+.btn-secondary:hover {
+    background: rgba(46, 139, 87, 0.12);
+    color: var(--color-title);
+    transform: translateY(-1px);
+}
+
+.error h1,
+.error-title {
+    color: var(--danger) !important;
+}
+
+.error p {
+    color: #7f1d1d !important;
+}
+
+.loading-text {
+    color: var(--color-text);
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px;
+    }
+
+    .thank-container,
+    .success-card {
+        padding: 24px 18px 20px;
+        border-radius: 18px;
+    }
+
+    .details,
+    .details-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .quranic-verse {
+        font-size: 1.02rem;
+        line-height: 1.9;
+    }
+
+    .btn-home,
+    .btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .success-icon {
+        width: 72px;
+        height: 72px;
+        font-size: 32px;
+    }
+
+    .state-box h1,
+    .success-title,
+    .thank-container h1,
+    .success-card h1 {
+        font-size: 1.35rem;
+    }
+
+    .state-box p,
+    .success-subtitle,
+    .thank-container p,
+    .success-card p {
+        font-size: 0.98rem;
+    }
+
+    .detail-item,
+    .detail-card {
+        padding: 14px;
+    }
+}
