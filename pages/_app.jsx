@@ -11,6 +11,9 @@ export default function App({ Component, pageProps }) {
   // path: pages/_app.jsx - في صفحة الريلز نبقي Navbar ظاهر ونخفي Footer فقط
   const hideFooterOnReels = pageType === 'reels';
 
+  // path: pages/_app.jsx - في صفحتي النجاح والإلغاء نخفي Navbar و Footer بالكامل
+  const hideLayoutChrome = pageType === 'success' || pageType === 'cancel';
+
   useEffect(() => {
     const disableZoom = (e) => {
       if (e.ctrlKey) e.preventDefault();
@@ -51,17 +54,19 @@ export default function App({ Component, pageProps }) {
       </Head>
 
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Navbar
-          pageType={pageType}
-          newsTypesObject={newsTypesObject}
-          searchQuery={searchQuery}
-        />
+        {!hideLayoutChrome && (
+          <Navbar
+            pageType={pageType}
+            newsTypesObject={newsTypesObject}
+            searchQuery={searchQuery}
+          />
+        )}
 
         <main style={{ flex: 1 }}>
           <Component {...pageProps} />
         </main>
 
-        {!hideFooterOnReels && <Footer footer={footerData} />}
+        {!hideLayoutChrome && !hideFooterOnReels && <Footer footer={footerData} />}
       </div>
     </>
   );
@@ -98,6 +103,12 @@ App.getInitialProps = async (appContext) => {
 
   if (pathname === '/') {
     pageType = 'index';
+  } else if (pathname === '/success') {
+    // path: pages/_app.jsx - تعريف صفحة النجاح لإخفاء Navbar و Footer
+    pageType = 'success';
+  } else if (pathname === '/cancel') {
+    // path: pages/_app.jsx - تعريف صفحة الإلغاء لإخفاء Navbar و Footer
+    pageType = 'cancel';
   } else if (pathname.startsWith('/reels')) {
     // path: pages/_app.jsx - تعريف صفحة الريلز حتى يتعامل معها Navbar/Footer بشكل خاص
     pageType = 'reels';
